@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PolicyPilot — Discover Indian government schemes tailored to your profile. Get personalized recommendations for PM-KISAN, Ayushman Bharat, Mudra Loans, and 20+ more schemes.">
+    <title>PolicyPilot — Your Government Scheme Advisor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="bg-orb bg-orb-3"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="/static/logo.png" alt="PolicyPilot" class="logo-img">
+                <div>
+                    <h1 class="logo-text">Policy<span class="logo-accent">Pilot</span></h1>
+                    <p class="logo-tagline">Your Government Scheme Advisor</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="lang-toggle" id="langToggle" title="Switch Language">
+                    <span id="langLabel">EN</span> / <span id="langLabelAlt">हिं</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero" id="hero">
+            <div class="hero-badge">🇮🇳 Trusted by citizens across India</div>
+            <h2 class="hero-title" data-en="Discover Government Schemes<br>Made For <span class='highlight'>You</span>" data-hi="सरकारी योजनाएं खोजें<br>जो <span class='highlight'>आपके</span> लिए बनी हैं">Discover Government Schemes<br>Made For <span class="highlight">You</span></h2>
+            <p class="hero-subtitle" data-en="Tell us about yourself and we'll find the best schemes you're eligible for — from PM-KISAN to Ayushman Bharat and 20+ more." data-hi="अपने बारे में बताएं और हम आपके लिए सबसे अच्छी योजनाएं ढूंढेंगे — PM-KISAN से लेकर आयुष्मान भारत और 20+ और योजनाएं।">Tell us about yourself and we'll find the best schemes you're eligible for — from PM-KISAN to Ayushman Bharat and 20+ more.</p>
+
+            <!-- Mode Toggle -->
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="chatModeBtn" data-en="💬 Chat with Advisor" data-hi="💬 सलाहकार से बात करें">💬 Chat with Advisor</button>
+                <button class="mode-btn" id="formModeBtn" data-en="📝 Fill Profile Form" data-hi="📝 प्रोफ़ाइल फ़ॉर्म भरें">📝 Fill Profile Form</button>
+            </div>
+        </section>
+
+        <!-- Chat Interface -->
+        <section class="chat-section" id="chatSection">
+            <div class="chat-container glass-card">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-msg bot-msg fade-in">
+                        <div class="msg-avatar">🧭</div>
+                        <div class="msg-content">
+                            <p id="welcomeMsg" data-en="Hello! 👋 I'm your PolicyPilot advisor.<br><br>Just tell me about yourself naturally, for example:<br><em>&quot;I am a 28 year old farmer from UP, SC category, income 2 lakh&quot;</em><br><br>Or simply say: <em>&quot;I'm a student from Bihar&quot;</em> — I'll ask what else I need! 🇮🇳" data-hi="नमस्ते! 👋 मैं आपका PolicyPilot सलाहकार हूँ।<br><br>बस अपने बारे में बताएं, जैसे:<br><em>&quot;मैं 28 साल का किसान हूँ UP से, SC वर्ग, आमदनी 2 लाख&quot;</em><br><br>या बस कहें: <em>&quot;मैं Bihar से एक student हूँ&quot;</em> — मैं बाकी पूछ लूंगा! 🇮🇳">Hello! 👋 I'm your PolicyPilot advisor.<br><br>Just tell me about yourself naturally, for example:<br><em>"I am a 28 year old farmer from UP, SC category, income 2 lakh"</em><br><br>Or simply say: <em>"I'm a student from Bihar"</em> — I'll ask what else I need! 🇮🇳</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Tell me about yourself..." data-en-placeholder="Tell me about yourself..." data-hi-placeholder="अपने बारे में बताएं..." autocomplete="off">
+                    <button class="chat-voice-btn" id="voiceBtn" title="Voice Input" type="button">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                    </button>
+                    <button class="chat-send-btn" id="chatSendBtn" title="Send">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Form Interface -->
+        <section class="form-section hidden" id="formSection">
+            <form class="profile-form glass-card" id="profileForm">
+                <h3 class="form-title" data-en="📋 Your Profile" data-hi="📋 आपकी प्रोफ़ाइल">📋 Your Profile</h3>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="formAge" data-en="Age" data-hi="उम्र">Age</label>
+                        <input type="number" id="formAge" min="0" max="120" placeholder="e.g., 28" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formGender" data-en="Gender" data-hi="लिंग">Gender</label>
+                        <select id="formGender" required>
+                            <option value="male" data-en="Male" data-hi="पुरुष">Male</option>
+                            <option value="female" data-en="Female" data-hi="महिला">Female</option>
+                            <option value="other" data-en="Other" data-hi="अन्य">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formIncome" data-en="Annual Income (₹)" data-hi="सालाना आमदनी (₹)">Annual Income (₹)</label>
+                        <input type="number" id="formIncome" min="0" placeholder="e.g., 200000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formState" data-en="State" data-hi="राज्य">State</label>
+                        <select id="formState" required>
+                            <option value="" data-en="-- Select State --" data-hi="-- राज्य चुनें --">-- Select State --</option>
+                            <option value="andhra pradesh" data-en="Andhra Pradesh" data-hi="आंध्र प्रदेश">Andhra Pradesh</option>
+                            <option value="arunachal pradesh" data-en="Arunachal Pradesh" data-hi="अरुणाचल प्रदेश">Arunachal Pradesh</option>
+                            <option value="assam" data-en="Assam" data-hi="असम">Assam</option>
+                            <option value="bihar" data-en="Bihar" data-hi="बिहार">Bihar</option>
+                            <option value="chhattisgarh" data-en="Chhattisgarh" data-hi="छत्तीसगढ़">Chhattisgarh</option>
+                            <option value="goa" data-en="Goa" data-hi="गोवा">Goa</option>
+                            <option value="gujarat" data-en="Gujarat" data-hi="गुजरात">Gujarat</option>
+                            <option value="haryana" data-en="Haryana" data-hi="हरियाणा">Haryana</option>
+                            <option value="himachal pradesh" data-en="Himachal Pradesh" data-hi="हिमाचल प्रदेश">Himachal Pradesh</option>
+                            <option value="jharkhand" data-en="Jharkhand" data-hi="झारखंड">Jharkhand</option>
+                            <option value="karnataka" data-en="Karnataka" data-hi="कर्नाटक">Karnataka</option>
+                            <option value="kerala" data-en="Kerala" data-hi="केरल">Kerala</option>
+                            <option value="madhya pradesh" data-en="Madhya Pradesh" data-hi="मध्य प्रदेश">Madhya Pradesh</option>
+                            <option value="maharashtra" data-en="Maharashtra" data-hi="महाराष्ट्र">Maharashtra</option>
+                            <option value="manipur" data-en="Manipur" data-hi="मणिपुर">Manipur</option>
+                            <option value="meghalaya" data-en="Meghalaya" data-hi="मेघालय">Meghalaya</option>
+                            <option value="mizoram" data-en="Mizoram" data-hi="मिज़ोरम">Mizoram</option>
+                            <option value="nagaland" data-en="Nagaland" data-hi="नागालैंड">Nagaland</option>
+                            <option value="odisha" data-en="Odisha" data-hi="ओडिशा">Odisha</option>
+                            <option value="punjab" data-en="Punjab" data-hi="पंजाब">Punjab</option>
+                            <option value="rajasthan" data-en="Rajasthan" data-hi="राजस्थान">Rajasthan</option>
+                            <option value="sikkim" data-en="Sikkim" data-hi="सिक्किम">Sikkim</option>
+                            <option value="tamil nadu" data-en="Tamil Nadu" data-hi="तमिलनाडु">Tamil Nadu</option>
+                            <option value="telangana" data-en="Telangana" data-hi="तेलंगाना">Telangana</option>
+                            <option value="tripura" data-en="Tripura" data-hi="त्रिपुरा">Tripura</option>
+                            <option value="uttar pradesh" data-en="Uttar Pradesh" data-hi="उत्तर प्रदेश">Uttar Pradesh</option>
+                            <option value="uttarakhand" data-en="Uttarakhand" data-hi="उत्तराखंड">Uttarakhand</option>
+                            <option value="west bengal" data-en="West Bengal" data-hi="पश्चिम बंगाल">West Bengal</option>
+                            <option value="delhi" data-en="Delhi" data-hi="दिल्ली">Delhi</option>
+                            <option value="jammu and kashmir" data-en="Jammu & Kashmir" data-hi="जम्मू और कश्मीर">Jammu & Kashmir</option>
+                            <option value="ladakh" data-en="Ladakh" data-hi="लद्दाख">Ladakh</option>
+                            <option value="chandigarh" data-en="Chandigarh" data-hi="चंडीगढ़">Chandigarh</option>
+                            <option value="puducherry" data-en="Puducherry" data-hi="पुडुचेरी">Puducherry</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formCategory" data-en="Category" data-hi="श्रेणी">Category</label>
+                        <select id="formCategory" required>
+                            <option value="general" data-en="General" data-hi="सामान्य">General</option>
+                            <option value="obc" data-en="OBC" data-hi="ओबीसी">OBC</option>
+                            <option value="sc" data-en="SC" data-hi="अनुसूचित जाति">SC</option>
+                            <option value="st" data-en="ST" data-hi="अनुसूचित जनजाति">ST</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formOccupation" data-en="Occupation" data-hi="पेशा">Occupation</label>
+                        <select id="formOccupation" required>
+                            <option value="" data-en="-- Select --" data-hi="-- चुनें --">-- Select --</option>
+                            <option value="farmer" data-en="Farmer / Kisan" data-hi="किसान">Farmer / Kisan</option>
+                            <option value="student" data-en="Student" data-hi="विद्यार्थी">Student</option>
+                            <option value="self_employed" data-en="Self Employed" data-hi="स्वरोजगार">Self Employed</option>
+                            <option value="business" data-en="Business Owner" data-hi="व्यापारी">Business Owner</option>
+                            <option value="entrepreneur" data-en="Entrepreneur / Startup" data-hi="उद्यमी / स्टार्टअप">Entrepreneur / Startup</option>
+                            <option value="laborer" data-en="Laborer / Mazdoor" data-hi="मज़दूर">Laborer / Mazdoor</option>
+                            <option value="daily_wage" data-en="Daily Wage Worker" data-hi="दैनिक मज़दूर">Daily Wage Worker</option>
+                            <option value="artisan" data-en="Artisan / Craftsperson" data-hi="कारीगर / शिल्पकार">Artisan / Craftsperson</option>
+                            <option value="street_vendor" data-en="Street Vendor / Hawker" data-hi="रेहड़ी / फेरीवाला">Street Vendor / Hawker</option>
+                            <option value="private_employee" data-en="Private Job" data-hi="निजी नौकरी">Private Job</option>
+                            <option value="government_employee" data-en="Government Employee" data-hi="सरकारी कर्मचारी">Government Employee</option>
+                            <option value="homemaker" data-en="Homemaker" data-hi="गृहिणी">Homemaker</option>
+                            <option value="unemployed" data-en="Unemployed / Job Seeker" data-hi="बेरोज़गार / नौकरी खोज रहे हैं">Unemployed / Job Seeker</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group conditions-group">
+                    <label data-en="Special Conditions (check all that apply)" data-hi="विशेष स्थितियां (सभी लागू चुनें)">Special Conditions (check all that apply)</label>
+                    <div class="conditions-grid">
+                        <label class="checkbox-label"><input type="checkbox" value="farmer"> 🌾 <span data-en="Farmer" data-hi="किसान">Farmer</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="student"> 🎓 <span data-en="Student" data-hi="विद्यार्थी">Student</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="disability"> ♿ <span data-en="Disability" data-hi="दिव्यांग">Disability</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="senior_citizen"> 🧓 <span data-en="Senior Citizen (60+)" data-hi="वरिष्ठ नागरिक (60+)">Senior Citizen (60+)</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="widow"> 👩 <span data-en="Widow" data-hi="विधवा">Widow</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="rural"> 🏡 <span data-en="Rural Area" data-hi="ग्रामीण क्षेत्र">Rural Area</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="artisan"> 🔨 <span data-en="Artisan/Craftsperson" data-hi="कारीगर">Artisan/Craftsperson</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="street_vendor"> 🏪 <span data-en="Street Vendor" data-hi="रेहड़ी/ठेला">Street Vendor</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="parent_of_girl_child"> 👧 <span data-en="Parent of Girl Child" data-hi="बेटी के माता/पिता">Parent of Girl Child</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="woman_head"> 🏠 <span data-en="Woman-headed Household" data-hi="महिला मुखिया">Woman-headed Household</span></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text" data-en="🔍 Find My Schemes" data-hi="🔍 मेरी योजनाएं खोजें">🔍 Find My Schemes</span>
+                    <span class="btn-loader hidden">
+                        <span class="spinner"></span>
+                    </span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section hidden" id="resultsSection">
+            <!-- Populated by JavaScript -->
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>PolicyPilot — Empowering citizens with knowledge 🇮🇳</p>
+        <p class="footer-disclaimer">Data sourced from official government portals. Always verify scheme details on <a href="https://www.myscheme.gov.in" target="_blank">myScheme.gov.in</a></p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
