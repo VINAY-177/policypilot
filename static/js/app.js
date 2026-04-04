@@ -150,6 +150,7 @@
         addTypingIndicator();
 
         try {
+
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -161,6 +162,7 @@
             });
 
             const data = await response.json();
+            
             removeTypingIndicator();
 
             // Update accumulated profile
@@ -460,10 +462,12 @@
         let stepsHTML = '';
         if (scheme.howToApply && scheme.howToApply.length > 0) {
             stepsHTML = `
-                <div class="scheme-steps">
-                    <div class="scheme-steps-title">📋 ${currentLang === 'hi' ? 'आवेदन कैसे करें' : 'How to Apply'}</div>
-                    <ol>${scheme.howToApply.map(step => `<li>${step}</li>`).join('')}</ol>
-                </div>
+                <details class="scheme-details-card scheme-steps-interactive">
+                    <summary class="scheme-steps-title">📋 ${currentLang === 'hi' ? 'आवेदन कैसे करें (क्लिक करें)' : 'How to Apply (Click to expand)'}</summary>
+                    <div class="details-content">
+                        <ol>${scheme.howToApply.map(step => `<li>${step}</li>`).join('')}</ol>
+                    </div>
+                </details>
             `;
         }
 
@@ -480,9 +484,11 @@
             <div class="scheme-why">✅ ${currentLang === 'hi' ? 'आप पात्र क्यों हैं' : 'Why you qualify'}: ${scheme.whyQualify}</div>
             <div class="scheme-explanation">${scheme.simpleExplanation}</div>
             ${stepsHTML}
-            <a href="${scheme.officialUrl}" target="_blank" class="scheme-link">
-                🌐 ${currentLang === 'hi' ? 'आधिकारिक वेबसाइट' : 'Official Website'} →
-            </a>
+            <div class="scheme-action-row">
+                <a href="${scheme.officialUrl}" target="_blank" class="scheme-link scheme-action-btn">
+                    🌐 ${currentLang === 'hi' ? 'आधिकारिक वेबसाइट' : 'Apply on Official Website'} →
+                </a>
+            </div>
         `;
 
         return card;
