@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolicyPilot — Sign In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+            z-index: 10;
+        }
+        .login-box {
+            max-width: 420px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .login-logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .login-logo img {
+            width: 50px;
+            height: 50px;
+        }
+        .login-title {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .login-submit {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="bg-orb bg-orb-3"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="glass-card login-box">
+            <div class="login-logo">
+                <img src="/static/logo.png" alt="PolicyPilot Icon">
+                <h1 class="logo-text" style="font-size: 32px;">Policy<span class="logo-accent">Pilot</span></h1>
+            </div>
+            
+            <h2 class="login-title">Welcome</h2>
+            <p class="login-subtitle">Sign in to find the best government schemes tailored specifically for you.</p>
+
+            <form action="/login" method="POST" class="login-form">
+                <div class="form-group">
+                    <label for="name">Your Name</label>
+                    <input type="text" id="name" name="name" placeholder="E.g. Ramesh Kumar" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                </div>
+                <!-- <div class="form-group">
+                    <label for="phone">Phone Number (Optional)</label>
+                    <input type="tel" id="phone" name="phone" placeholder="10-digit number" style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                </div> -->
+                
+                <button type="submit" class="submit-btn login-submit">Get Started</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

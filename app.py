@@ -7,9 +7,10 @@ Includes a natural language parser for conversational queries.
 import json
 import re
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "super_secret_policypilot_key_dev")
 
 # Load schemes database (Reloads on start again)
 SCHEMES_PATH = os.path.join(os.path.dirname(__file__), "schemes.json")
@@ -479,7 +480,29 @@ def _build_why_qualify(profile, scheme):
 # -------------------------------------------------------------------
 @app.route("/")
 def index():
-    return render_template("index.html")
+    if "user_name" in session:
+        return redirect(url_for("advisor"))
+    return render_template("login.html")
+
+
+@app.route("/login", methods=["POST"])
+def login():
+    name = request.form.get("name", "").strip()
+    if name:
+        session["user_name"] = name
+    return redirect(url_for("advisor"))
+
+
+@app.route("/logout")
+def logout():
+    session.pop("user_name", None)
+    return redirect(url_for("index"))
+
+
+@app.route("/advisor")
+def advisor():
+    user_name = session.get("user_name", "")
+    return render_template("index.html", user_name=user_name)
 
 
 @app.route("/api/recommend", methods=["POST"])
