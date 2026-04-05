@@ -121,14 +121,34 @@
             </div>
         </div>
 
-        <div class="dashboard-grid">
-            <div class="glass-card dash-card">
-                <h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Saved Schemes</h3>
-                <div class="empty-state">
-                    <p>You haven't saved any schemes yet.</p>
-                    <p style="font-size: 14px; margin-top: 8px;">Explore the Policy Advisor to find and save schemes matching your profile!</p>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+            
+            <div class="glass-card dash-card" style="grid-column: 1 / -1;">
+                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Account Profile</h3>
+                <div style="font-size: 15px; color: var(--text-secondary); margin-top: 15px; background: rgba(255,255,255,0.4); padding: 20px; border-radius: var(--border-radius-sm);">
+                    <p style="margin-bottom: 12px;"><strong style="color: var(--text-primary);">Full Name:</strong> {{ user_name }}</p>
+                    <p style="margin-bottom: 12px;"><strong style="color: var(--text-primary);">Registered Phone:</strong> {{ user_phone }}</p>
+                    <p><strong style="color: var(--text-primary);">Account Status:</strong> <span style="color: var(--accent-primary); font-weight: 600; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 4px;">Verified User ✓</span></p>
                 </div>
             </div>
+
+            <div class="glass-card dash-card">
+                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Recent Updates</h3>
+                <ul style="list-style: none; padding: 0; margin-top: 15px; font-size: 14px; color: var(--text-secondary);">
+                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">✨ <strong>New Scheme:</strong> PM Surya Ghar Yojana Added!</li>
+                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">✨ <strong>New Feature:</strong> Chat Assistant now fully supports Hindi NLP!</li>
+                    <li>🔔 <strong>Notice:</strong> Ask the assistant directly for "Business Loans" to find hidden grants.</li>
+                </ul>
+            </div>
+
+            <div class="glass-card dash-card">
+                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Saved Schemes</h3>
+                <div class="empty-state" style="padding: 20px;">
+                    <p>You haven't saved any schemes yet.</p>
+                    <p style="font-size: 13px; margin-top: 8px;">Click "Launch Advisor" to start discovering.</p>
+                </div>
+            </div>
+
         </div>
 
     </main>

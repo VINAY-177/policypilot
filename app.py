@@ -8,6 +8,8 @@ import json
 import re
 import os
 import sqlite3
+import psycopg2
+import psycopg2.extras
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
@@ -15,28 +17,79 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "super_secret_yojanamitra_key_dev")
 
-if os.environ.get("VERCEL"):
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if os.environ.get("VERCEL") and not DATABASE_URL:
     DB_PATH = "/tmp/database.db"
 else:
     DB_PATH = os.path.join(os.path.dirname(__file__), "database.db")
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+    if DATABASE_URL:
+        conn = psycopg2.connect(DATABASE_URL)
+        return conn
+    else:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        return conn
 
 def init_db():
     conn = get_db_connection()
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            phone TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
+    if DATABASE_URL:
+        with conn.cursor() as cur:
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    phone TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL
+                )
+            ''')
+        conn.commit()
+    else:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                phone TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
     conn.close()
+
+def create_user(name, phone, password_hash):
+    conn = get_db_connection()
+    try:
+        if DATABASE_URL:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "INSERT INTO users (name, phone, password_hash) VALUES (%s, %s, %s)",
+                    (name, phone, password_hash)
+                )
+        else:
+            conn.execute(
+                "INSERT INTO users (name, phone, password_hash) VALUES (?, ?, ?)",
+                (name, phone, password_hash)
+            )
+        conn.commit()
+        return True
+    except Exception as e:
+        return False
+    finally:
+        conn.close()
+
+def get_user_by_phone(phone):
+    conn = get_db_connection()
+    user = None
+    if DATABASE_URL:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("SELECT id, name, phone, password_hash FROM users WHERE phone = %s", (phone,))
+            user = cur.fetchone()
+    else:
+        user = conn.execute("SELECT id, name, phone, password_hash FROM users WHERE phone = ?", (phone,)).fetchone()
+    conn.close()
+    return user
 
 with app.app_context():
     init_db()
@@ -404,9 +457,9 @@ def get_recommendations(profile, lang="en"):
     # Sort by score descending
     eligible.sort(key=lambda x: x["score"], reverse=True)
 
-    # Split into top 3 and others
-    top3 = eligible[:3]
-    others = eligible[3:15] # Limit others to 12
+    # Show ALL valid schemes instead of just the top 3
+    top3 = eligible
+    others = []
     total_eligible = len(eligible)
 
     # Use pre-translated fields if requested
@@ -533,20 +586,13 @@ def register():
         flash("All fields are required")
         return redirect(url_for("index"))
         
-    conn = get_db_connection()
-    try:
-        conn.execute(
-            "INSERT INTO users (name, phone, password_hash) VALUES (?, ?, ?)",
-            (name, phone, generate_password_hash(password))
-        )
-        conn.commit()
-    except sqlite3.IntegrityError:
+    success = create_user(name, phone, generate_password_hash(password))
+    
+    if not success:
         flash("Phone number already registered. Please sign in.")
-        conn.close()
         return redirect(url_for("index"))
         
-    user = conn.execute("SELECT id, name FROM users WHERE phone = ?", (phone,)).fetchone()
-    conn.close()
+    user = get_user_by_phone(phone)
     
     session["user_id"] = user["id"]
     session["user_name"] = user["name"]
@@ -559,9 +605,7 @@ def login():
     phone = request.form.get("phone", "").strip()
     password = request.form.get("password", "")
     
-    conn = get_db_connection()
-    user = conn.execute("SELECT * FROM users WHERE phone = ?", (phone,)).fetchone()
-    conn.close()
+    user = get_user_by_phone(phone)
     
     if user and check_password_hash(user["password_hash"], password):
         session["user_id"] = user["id"]
