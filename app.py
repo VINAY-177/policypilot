@@ -7,10 +7,36 @@ Includes a natural language parser for conversational queries.
 import json
 import re
 import os
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+import sqlite3
+from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "super_secret_policypilot_key_dev")
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "database.db")
+
+def get_db_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def init_db():
+    conn = get_db_connection()
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            phone TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+with app.app_context():
+    init_db()
 
 # Load schemes database (Reloads on start again)
 SCHEMES_PATH = os.path.join(os.path.dirname(__file__), "schemes.json")
@@ -478,31 +504,88 @@ def _build_why_qualify(profile, scheme):
 # -------------------------------------------------------------------
 # Flask Routes
 # -------------------------------------------------------------------
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            return redirect(url_for("index"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route("/")
 def index():
-    if "user_name" in session:
-        return redirect(url_for("advisor"))
+    if "user_id" in session:
+        return redirect(url_for("dashboard"))
     return render_template("login.html")
+
+
+@app.route("/register", methods=["POST"])
+def register():
+    name = request.form.get("name", "").strip()
+    phone = request.form.get("phone", "").strip()
+    password = request.form.get("password", "")
+    
+    if not name or not phone or not password:
+        flash("All fields are required")
+        return redirect(url_for("index"))
+        
+    conn = get_db_connection()
+    try:
+        conn.execute(
+            "INSERT INTO users (name, phone, password_hash) VALUES (?, ?, ?)",
+            (name, phone, generate_password_hash(password))
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        flash("Phone number already registered. Please sign in.")
+        conn.close()
+        return redirect(url_for("index"))
+        
+    user = conn.execute("SELECT id, name FROM users WHERE phone = ?", (phone,)).fetchone()
+    conn.close()
+    
+    session["user_id"] = user["id"]
+    session["user_name"] = user["name"]
+    session["user_phone"] = phone
+    return redirect(url_for("dashboard"))
 
 
 @app.route("/login", methods=["POST"])
 def login():
-    name = request.form.get("name", "").strip()
-    if name:
-        session["user_name"] = name
-    return redirect(url_for("advisor"))
+    phone = request.form.get("phone", "").strip()
+    password = request.form.get("password", "")
+    
+    conn = get_db_connection()
+    user = conn.execute("SELECT * FROM users WHERE phone = ?", (phone,)).fetchone()
+    conn.close()
+    
+    if user and check_password_hash(user["password_hash"], password):
+        session["user_id"] = user["id"]
+        session["user_name"] = user["name"]
+        session["user_phone"] = user["phone"]
+        return redirect(url_for("dashboard"))
+    else:
+        flash("Invalid phone number or password")
+        return redirect(url_for("index"))
 
 
 @app.route("/logout")
 def logout():
-    session.pop("user_name", None)
+    session.clear()
     return redirect(url_for("index"))
 
 
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html", user_name=session.get("user_name"), user_phone=session.get("user_phone"))
+
+
 @app.route("/advisor")
+@login_required
 def advisor():
-    user_name = session.get("user_name", "")
-    return render_template("index.html", user_name=user_name)
+    return render_template("index.html", user_name=session.get("user_name"))
 
 
 @app.route("/api/recommend", methods=["POST"])

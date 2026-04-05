@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PolicyPilot — Sign In</title>
+    <title>PolicyPilot — Sign In / Register</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
@@ -27,7 +27,7 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         .login-logo img {
             width: 50px;
@@ -41,20 +41,68 @@
         .login-subtitle {
             color: var(--text-secondary);
             font-size: 14px;
-            margin-bottom: 32px;
+            margin-bottom: 24px;
             line-height: 1.5;
         }
         .login-form .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             text-align: left;
         }
         .login-submit {
             margin-top: 10px;
         }
+        
+        /* Auth Tabs */
+        .auth-tabs {
+            display: flex;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: var(--border-radius-xs);
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-radius: var(--border-radius-xs);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .auth-tab.active {
+            background: white;
+            color: var(--accent-primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .auth-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .auth-section.active {
+            display: block;
+        }
+        
+        .flash-msg {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
     <div class="bg-animation">
         <div class="bg-orb bg-orb-1"></div>
         <div class="bg-orb bg-orb-2"></div>
@@ -71,19 +119,75 @@
             <h2 class="login-title">Welcome</h2>
             <p class="login-subtitle">Sign in to find the best government schemes tailored specifically for you.</p>
 
-            <form action="/login" method="POST" class="login-form">
-                <div class="form-group">
-                    <label for="name">Your Name</label>
-                    <input type="text" id="name" name="name" placeholder="E.g. Ramesh Kumar" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
-                </div>
-                <!-- <div class="form-group">
-                    <label for="phone">Phone Number (Optional)</label>
-                    <input type="tel" id="phone" name="phone" placeholder="10-digit number" style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
-                </div> -->
-                
-                <button type="submit" class="submit-btn login-submit">Get Started</button>
-            </form>
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for message in messages %}
+                  <div class="flash-msg">{{ message }}</div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Sign In</div>
+                <div class="auth-tab" id="tab-register" onclick="switchAuth('register')">Create Account</div>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <div id="section-login" class="auth-section active">
+                <form action="/login" method="POST" class="login-form">
+                    <div class="form-group">
+                        <label for="login-phone">Phone Number</label>
+                        <input type="tel" id="login-phone" name="phone" placeholder="10-digit mobile number" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" name="password" placeholder="Enter password" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn login-submit">Sign In</button>
+                </form>
+            </div>
+
+            <!-- REGISTER FORM -->
+            <div id="section-register" class="auth-section">
+                <form action="/register" method="POST" class="login-form">
+                    <div class="form-group">
+                        <label for="reg-name">Full Name</label>
+                        <input type="text" id="reg-name" name="name" placeholder="E.g. Ramesh Kumar" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-phone">Phone Number</label>
+                        <input type="tel" id="reg-phone" name="phone" placeholder="10-digit mobile number" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Password</label>
+                        <input type="password" id="reg-password" name="password" placeholder="Create a password" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn login-submit">Create Account</button>
+                </form>
+            </div>
+
         </div>
     </div>
+
+    <script>
+        function switchAuth(type) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-section').forEach(s => s.classList.remove('active'));
+            
+            document.getElementById('tab-' + type).classList.add('active');
+            document.getElementById('section-' + type).classList.add('active');
+            
+            // Adjust title
+            if(type === 'login') {
+                document.querySelector('.login-title').innerText = 'Welcome Back';
+                document.querySelector('.login-subtitle').innerText = 'Sign in to find the best government schemes tailored specifically for you.';
+            } else {
+                document.querySelector('.login-title').innerText = 'Create Account';
+                document.querySelector('.login-subtitle').innerText = 'Join PolicyPilot to securely save your profile and scheme matches.';
+            }
+        }
+    </script>
 </body>
 </html>
