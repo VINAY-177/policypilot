@@ -362,7 +362,7 @@
             const response = await fetch('/api/recommend', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(profile)
+                body: JSON.stringify({ ...profile, lang: currentLang })
             });
 
             const data = await response.json();

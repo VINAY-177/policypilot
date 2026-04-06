@@ -273,13 +273,13 @@
                     </defs>
                 </svg>
             </div>
-            <h2>Your Gateway to 1500+ Government Schemes</h2>
-            <p>Discover schemes for education, health, housing, agriculture, business, and more — all personalized by AI to match your exact profile.</p>
+            <h2 data-en="Your Gateway to 1500+ Government Schemes" data-hi="1500+ सरकारी योजनाओं का प्रवेश द्वार">Your Gateway to 1500+ Government Schemes</h2>
+            <p data-en="Discover schemes for education, health, housing, agriculture, business, and more — all personalized by AI to match your exact profile." data-hi="शिक्षा, स्वास्थ्य, आवास, कृषि, व्यापार और अन्य योजनाएं खोजें — सभी AI द्वारा आपकी प्रोफ़ाइल के अनुसार वैयक्तिकृत।">Discover schemes for education, health, housing, agriculture, business, and more — all personalized by AI to match your exact profile.</p>
             <div class="feature-pills">
-                <span class="feature-pill">🎯 AI-Powered Matching</span>
-                <span class="feature-pill">🗣️ Voice Assistant</span>
-                <span class="feature-pill">🌐 Hindi + English</span>
-                <span class="feature-pill">⭐ Save Favorites</span>
+                <span class="feature-pill" data-en="🎯 AI-Powered Matching" data-hi="🎯 AI-संचालित मिलान">🎯 AI-Powered Matching</span>
+                <span class="feature-pill" data-en="🗣️ Voice Assistant" data-hi="🗣️ वॉइस असिस्टेंट">🗣️ Voice Assistant</span>
+                <span class="feature-pill" data-en="🌐 Hindi + English" data-hi="🌐 हिंदी + अंग्रेज़ी">🌐 Hindi + English</span>
+                <span class="feature-pill" data-en="⭐ Save Favorites" data-hi="⭐ पसंदीदा सहेजें">⭐ Save Favorites</span>
             </div>
         </div>
 
@@ -289,9 +289,12 @@
                 <img src="/static/logo.png?v=3" alt="Yojana Mitra" style="width: 80px; height: 80px; object-fit: contain;">
                 <h1 class="logo-text" style="font-size: 32px;">योजना <span class="logo-accent">Mitra</span></h1>
             </div>
+
+            <!-- Language Toggle -->
+            <button class="lang-toggle" id="loginLangToggle" style="margin-bottom: 16px; padding: 6px 14px; font-size: 12px;"><span id="loginLangLabel">EN</span> / <span id="loginLangAlt">हिं</span></button>
             
-            <h2 class="login-title">Welcome</h2>
-            <p class="login-subtitle">Sign in to find the best government schemes tailored specifically for you.</p>
+            <h2 class="login-title" data-en="Welcome" data-hi="स्वागत है">Welcome</h2>
+            <p class="login-subtitle" data-en="Sign in to find the best government schemes tailored specifically for you." data-hi="आपके लिए विशेष रूप से तैयार सर्वोत्तम सरकारी योजनाएं खोजने के लिए साइन इन करें।">Sign in to find the best government schemes tailored specifically for you.</p>
 
             {% with messages = get_flashed_messages() %}
               {% if messages %}
@@ -302,23 +305,23 @@
             {% endwith %}
 
             <div class="auth-tabs">
-                <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Sign In</div>
-                <div class="auth-tab" id="tab-register" onclick="switchAuth('register')">Create Account</div>
+                <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')" data-en="Sign In" data-hi="साइन इन">Sign In</div>
+                <div class="auth-tab" id="tab-register" onclick="switchAuth('register')" data-en="Create Account" data-hi="खाता बनाएं">Create Account</div>
             </div>
 
             <!-- LOGIN FORM -->
             <div id="section-login" class="auth-section active">
                 <form action="/login" method="POST" class="login-form">
                     <div class="form-group">
-                        <label for="login-phone">Phone Number</label>
-                        <input type="tel" id="login-phone" name="phone" placeholder="10-digit mobile number" required pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter a valid 10-digit mobile number" style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                        <label for="login-phone" data-en="Phone Number" data-hi="फ़ोन नंबर">Phone Number</label>
+                        <input type="tel" id="login-phone" name="phone" placeholder="10-digit mobile number" data-en-placeholder="10-digit mobile number" data-hi-placeholder="10 अंकों का मोबाइल नंबर" required pattern="[0-9]{10}" maxlength="10" minlength="10" style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
                     </div>
                     <div class="form-group">
-                        <label for="login-password">Password</label>
-                        <input type="password" id="login-password" name="password" placeholder="Enter password" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                        <label for="login-password" data-en="Password" data-hi="पासवर्ड">Password</label>
+                        <input type="password" id="login-password" name="password" placeholder="Enter password" data-en-placeholder="Enter password" data-hi-placeholder="पासवर्ड दर्ज करें" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
                     </div>
                     
-                    <button type="submit" class="submit-btn login-submit">Sign In</button>
+                    <button type="submit" class="submit-btn login-submit" data-en="Sign In" data-hi="साइन इन करें">Sign In</button>
                 </form>
             </div>
 
@@ -326,19 +329,19 @@
             <div id="section-register" class="auth-section">
                 <form action="/register" method="POST" class="login-form">
                     <div class="form-group">
-                        <label for="reg-name">Full Name</label>
-                        <input type="text" id="reg-name" name="name" placeholder="E.g. Ramesh Kumar" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                        <label for="reg-name" data-en="Full Name" data-hi="पूरा नाम">Full Name</label>
+                        <input type="text" id="reg-name" name="name" placeholder="E.g. Ramesh Kumar" data-en-placeholder="E.g. Ramesh Kumar" data-hi-placeholder="जैसे: रमेश कुमार" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
                     </div>
                     <div class="form-group">
-                        <label for="reg-phone">Phone Number</label>
-                        <input type="tel" id="reg-phone" name="phone" placeholder="10-digit mobile number" required pattern="[0-9]{10}" maxlength="10" minlength="10" title="Please enter a valid 10-digit mobile number" style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                        <label for="reg-phone" data-en="Phone Number" data-hi="फ़ोन नंबर">Phone Number</label>
+                        <input type="tel" id="reg-phone" name="phone" placeholder="10-digit mobile number" data-en-placeholder="10-digit mobile number" data-hi-placeholder="10 अंकों का मोबाइल नंबर" required pattern="[0-9]{10}" maxlength="10" minlength="10" style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
                     </div>
                     <div class="form-group">
-                        <label for="reg-password">Password</label>
-                        <input type="password" id="reg-password" name="password" placeholder="Create a password" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
+                        <label for="reg-password" data-en="Password" data-hi="पासवर्ड">Password</label>
+                        <input type="password" id="reg-password" name="password" placeholder="Create a password" data-en-placeholder="Create a password" data-hi-placeholder="पासवर्ड बनाएं" required style="width: 100%; padding: 14px 16px; border-radius: var(--border-radius-xs); border: 1px solid var(--glass-border); background: var(--bg-tertiary); font-family: var(--font-body); font-size: 15px;">
                     </div>
                     
-                    <button type="submit" class="submit-btn login-submit">Create Account</button>
+                    <button type="submit" class="submit-btn login-submit" data-en="Create Account" data-hi="खाता बनाएं">Create Account</button>
                 </form>
             </div>
 
@@ -346,15 +349,15 @@
             <div class="login-stats">
                 <div class="login-stat">
                     <div class="login-stat-number">1500+</div>
-                    <div class="login-stat-label">Schemes</div>
+                    <div class="login-stat-label" data-en="Schemes" data-hi="योजनाएं">Schemes</div>
                 </div>
                 <div class="login-stat">
                     <div class="login-stat-number">30</div>
-                    <div class="login-stat-label">States</div>
+                    <div class="login-stat-label" data-en="States" data-hi="राज्य">States</div>
                 </div>
                 <div class="login-stat">
                     <div class="login-stat-number">14</div>
-                    <div class="login-stat-label">Categories</div>
+                    <div class="login-stat-label" data-en="Categories" data-hi="श्रेणियां">Categories</div>
                 </div>
             </div>
 
@@ -362,22 +365,47 @@
     </div>
 
     <script>
+        let currentLang = 'en';
+
         function switchAuth(type) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.auth-section').forEach(s => s.classList.remove('active'));
-            
             document.getElementById('tab-' + type).classList.add('active');
             document.getElementById('section-' + type).classList.add('active');
-            
-            // Adjust title
+            const title = document.querySelector('.login-title');
+            const subtitle = document.querySelector('.login-subtitle');
             if(type === 'login') {
-                document.querySelector('.login-title').innerText = 'Welcome Back';
-                document.querySelector('.login-subtitle').innerText = 'Sign in to find the best government schemes tailored specifically for you.';
+                title.setAttribute('data-en', 'Welcome Back');
+                title.setAttribute('data-hi', 'वापसी पर स्वागत');
+                subtitle.setAttribute('data-en', 'Sign in to find the best government schemes tailored specifically for you.');
+                subtitle.setAttribute('data-hi', 'आपके लिए विशेष रूप से तैयार सर्वोत्तम सरकारी योजनाएं खोजने के लिए साइन इन करें।');
             } else {
-                document.querySelector('.login-title').innerText = 'Create Account';
-                document.querySelector('.login-subtitle').innerText = 'Join Yojana Mitra to securely save your profile and scheme matches.';
+                title.setAttribute('data-en', 'Create Account');
+                title.setAttribute('data-hi', 'खाता बनाएं');
+                subtitle.setAttribute('data-en', 'Join Yojana Mitra to securely save your profile and scheme matches.');
+                subtitle.setAttribute('data-hi', 'अपनी प्रोफ़ाइल और योजना मिलान सुरक्षित रूप से सहेजने के लिए योजना मित्र से जुड़ें।');
             }
+            title.textContent = title.getAttribute('data-' + currentLang);
+            subtitle.textContent = subtitle.getAttribute('data-' + currentLang);
         }
+
+        function applyLang(lang) {
+            document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                if (text) el.textContent = text;
+            });
+            document.querySelectorAll('[data-' + lang + '-placeholder]').forEach(el => {
+                const ph = el.getAttribute('data-' + lang + '-placeholder');
+                if (ph) el.placeholder = ph;
+            });
+        }
+
+        document.getElementById('loginLangToggle').addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            document.getElementById('loginLangLabel').textContent = currentLang === 'en' ? 'EN' : 'हिं';
+            document.getElementById('loginLangAlt').textContent = currentLang === 'en' ? 'हिं' : 'EN';
+            applyLang(currentLang);
+        });
     </script>
 </body>
 </html>

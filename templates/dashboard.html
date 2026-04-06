@@ -221,10 +221,11 @@
                 <img src="/static/logo.png?v=3" alt="Yojana Mitra" class="logo-img" style="width: 50px; height: 50px; object-fit: contain;">
                 <div>
                     <h1 class="logo-text">योजना <span class="logo-accent">Mitra</span></h1>
-                    <p class="logo-tagline">Your Government Scheme Advisor</p>
+                    <p class="logo-tagline" data-en="Your Government Scheme Advisor" data-hi="आपका सरकारी योजना सलाहकार">Your Government Scheme Advisor</p>
                 </div>
             </div>
             <div class="header-actions" style="display: flex; align-items: center; gap: 12px;">
+                <button class="lang-toggle" id="dashLangToggle" style="padding: 6px 14px; font-size: 12px; cursor: pointer;">EN / हिं</button>
                 <span style="font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
                     <span style="background: var(--accent-gradient); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-heading);">{{ user_name[0]|upper }}</span>
                     {{ user_name.split(' ')[0] }}
@@ -240,14 +241,14 @@
         
         <div class="glass-card welcome-card">
             <div class="user-info">
-                <h2>Welcome back, {{ user_name.split(' ')[0] }}!</h2>
+                <h2 data-en="Welcome back, {{ user_name.split(' ')[0] }}!" data-hi="वापसी पर स्वागत, {{ user_name.split(' ')[0] }}!">Welcome back, {{ user_name.split(' ')[0] }}!</h2>
                 <p>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                     {{ user_phone }}
                 </p>
             </div>
             <div>
-                <a href="/advisor" class="launch-btn">🔍 Policy Advisor</a>
+                <a href="/advisor" class="launch-btn" data-en="🔍 Policy Advisor" data-hi="🔍 नीति सलाहकार">🔍 Policy Advisor</a>
             </div>
         </div>
 
@@ -256,22 +257,22 @@
             <div class="glass-card stat-card">
                 <div class="stat-icon">📋</div>
                 <div class="stat-number">1553</div>
-                <div class="stat-label">Total Schemes</div>
+                <div class="stat-label" data-en="Total Schemes" data-hi="कुल योजनाएं">Total Schemes</div>
             </div>
             <div class="glass-card stat-card">
                 <div class="stat-icon">🗺️</div>
                 <div class="stat-number">30</div>
-                <div class="stat-label">States Covered</div>
+                <div class="stat-label" data-en="States Covered" data-hi="राज्य शामिल">States Covered</div>
             </div>
             <div class="glass-card stat-card">
                 <div class="stat-icon">🏷️</div>
                 <div class="stat-number">14</div>
-                <div class="stat-label">Categories</div>
+                <div class="stat-label" data-en="Categories" data-hi="श्रेणियां">Categories</div>
             </div>
             <div class="glass-card stat-card">
                 <div class="stat-icon">⭐</div>
                 <div class="stat-number">{{ saved_schemes|length }}</div>
-                <div class="stat-label">Saved</div>
+                <div class="stat-label" data-en="Saved" data-hi="सहेजे गए">Saved</div>
             </div>
         </div>
 
@@ -279,51 +280,51 @@
 
             <!-- Quick Actions -->
             <div class="glass-card dash-card">
-                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg> Quick Actions</h3>
+                <h3 style="color: var(--text-primary);" data-en-html="⚡ Quick Actions" data-hi-html="⚡ त्वरित कार्रवाई"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg> Quick Actions</h3>
                 <div class="quick-actions">
                     <a href="/advisor" class="quick-action">
                         <span class="quick-action-icon">🤖</span>
-                        Chat Advisor
+                        <span data-en="Chat Advisor" data-hi="चैट सलाहकार">Chat Advisor</span>
                     </a>
                     <a href="/advisor" class="quick-action">
                         <span class="quick-action-icon">📝</span>
-                        Fill Form
+                        <span data-en="Fill Form" data-hi="फॉर्म भरें">Fill Form</span>
                     </a>
                     <a href="/advisor" class="quick-action">
                         <span class="quick-action-icon">🗣️</span>
-                        Voice Search
+                        <span data-en="Voice Search" data-hi="वॉइस खोज">Voice Search</span>
                     </a>
                 </div>
             </div>
 
             <!-- Scheme Database Overview -->
             <div class="glass-card dash-card">
-                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg> Scheme Database</h3>
+                <h3 style="color: var(--text-primary);" data-en-html="📊 Scheme Database" data-hi-html="📊 योजना डेटाबेस"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg> Scheme Database</h3>
                 <div style="margin-top: 12px;">
-                    <div class="cat-bar-row"><span class="cat-bar-label">Education</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:100%;background:#7c3aed;"></div></div><span class="cat-bar-count">322</span></div>
-                    <div class="cat-bar-row"><span class="cat-bar-label">Rural</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:64%;background:#65a30d;"></div></div><span class="cat-bar-count">207</span></div>
-                    <div class="cat-bar-row"><span class="cat-bar-label">Business</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:56%;background:#2563eb;"></div></div><span class="cat-bar-count">180</span></div>
-                    <div class="cat-bar-row"><span class="cat-bar-label">Welfare</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:53%;background:#ca8a04;"></div></div><span class="cat-bar-count">170</span></div>
-                    <div class="cat-bar-row"><span class="cat-bar-label">Agriculture</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:43%;background:#10b981;"></div></div><span class="cat-bar-count">140</span></div>
-                    <div class="cat-bar-row"><span class="cat-bar-label">Health</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:25%;background:#059669;"></div></div><span class="cat-bar-count">126</span></div>
-                    <div class="cat-bar-row"><span class="cat-bar-label">Others</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:28%;background:#94a3b8;"></div></div><span class="cat-bar-count">408</span></div>
+                    <div class="cat-bar-row"><span class="cat-bar-label" data-en="Education" data-hi="शिक्षा">Education</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:100%;background:#7c3aed;"></div></div><span class="cat-bar-count">322</span></div>
+                    <div class="cat-bar-row"><span class="cat-bar-label" data-en="Rural" data-hi="ग्रामीण">Rural</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:64%;background:#65a30d;"></div></div><span class="cat-bar-count">207</span></div>
+                    <div class="cat-bar-row"><span class="cat-bar-label" data-en="Business" data-hi="व्यापार">Business</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:56%;background:#2563eb;"></div></div><span class="cat-bar-count">180</span></div>
+                    <div class="cat-bar-row"><span class="cat-bar-label" data-en="Welfare" data-hi="कल्याण">Welfare</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:53%;background:#ca8a04;"></div></div><span class="cat-bar-count">170</span></div>
+                    <div class="cat-bar-row"><span class="cat-bar-label" data-en="Agriculture" data-hi="कृषि">Agriculture</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:43%;background:#10b981;"></div></div><span class="cat-bar-count">140</span></div>
+                    <div class="cat-bar-row"><span class="cat-bar-label" data-en="Health" data-hi="स्वास्थ्य">Health</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:25%;background:#059669;"></div></div><span class="cat-bar-count">126</span></div>
+                    <div class="cat-bar-row"><span class="cat-bar-label" data-en="Others" data-hi="अन्य">Others</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:28%;background:#94a3b8;"></div></div><span class="cat-bar-count">408</span></div>
                 </div>
             </div>
             
             <!-- Recent Updates -->
             <div class="glass-card dash-card">
-                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Recent Updates</h3>
+                <h3 style="color: var(--text-primary);" data-en-html="🔔 Recent Updates" data-hi-html="🔔 हाल के अपडेट"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Recent Updates</h3>
                 <ul style="list-style: none; padding: 0; margin-top: 15px; font-size: 14px; color: var(--text-secondary);">
-                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">✨ <strong>New:</strong> 300+ state-level education & welfare schemes added!</li>
-                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">✨ <strong>Feature:</strong> Chat with the Advisor about any scheme in detail!</li>
-                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;">🔔 <strong>Update:</strong> Health, pension, housing, finance categories expanded.</li>
-                    <li>🏆 <strong>Milestone:</strong> 1500+ schemes now in the database!</li>
+                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;" data-en="✨ New: 300+ state-level education & welfare schemes added!" data-hi="✨ नया: 300+ राज्य-स्तरीय शिक्षा और कल्याण योजनाएं जोड़ी गईं!">✨ <strong>New:</strong> 300+ state-level education & welfare schemes added!</li>
+                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;" data-en="✨ Feature: Chat with the Advisor about any scheme in detail!" data-hi="✨ सुविधा: किसी भी योजना के बारे में सलाहकार से चर्चा करें!">✨ <strong>Feature:</strong> Chat with the Advisor about any scheme in detail!</li>
+                    <li style="margin-bottom: 15px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px;" data-en="🔔 Update: Health, pension, housing, finance categories expanded." data-hi="🔔 अपडेट: स्वास्थ्य, पेंशन, आवास, वित्त श्रेणियां विस्तारित।">🔔 <strong>Update:</strong> Health, pension, housing, finance categories expanded.</li>
+                    <li data-en="🏆 Milestone: 1500+ schemes now in the database!" data-hi="🏆 मील का पत्थर: डेटाबेस में अब 1500+ योजनाएं!">🏆 <strong>Milestone:</strong> 1500+ schemes now in the database!</li>
                 </ul>
             </div>
 
             <!-- Saved Schemes -->
             <div class="glass-card dash-card">
-                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Saved Schemes ({{ saved_schemes|length }})</h3>
+                <h3 style="color: var(--text-primary);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> <span data-en="Saved Schemes" data-hi="सहेजी गई योजनाएं">Saved Schemes</span> ({{ saved_schemes|length }})</h3>
                 {% if saved_schemes and saved_schemes|length > 0 %}
                 <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
                     {% for s in saved_schemes %}
@@ -333,15 +334,15 @@
                             <div style="font-weight: 600; color: var(--text-primary); font-size: 14px;">{{ s.scheme_name }}</div>
                             <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">💰 {{ s.scheme_benefit[:80] }}{% if s.scheme_benefit|length > 80 %}...{% endif %}</div>
                         </div>
-                        <button onclick="removeSaved('{{ s.scheme_id }}', this)" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Remove</button>
+                        <button onclick="removeSaved('{{ s.scheme_id }}', this)" data-en="Remove" data-hi="हटाएं" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Remove</button>
                     </div>
                     {% endfor %}
                 </div>
                 {% else %}
                 <div class="empty-state" style="padding: 20px;">
                     <p style="font-size: 32px; margin-bottom: 8px;">⭐</p>
-                    <p>You haven't saved any schemes yet.</p>
-                    <p style="font-size: 13px; margin-top: 8px;">Use the <strong>Policy Advisor</strong> and ⭐ Save schemes you like!</p>
+                    <p data-en="You haven't saved any schemes yet." data-hi="आपने अभी तक कोई योजना सहेजी नहीं है।">You haven't saved any schemes yet.</p>
+                    <p style="font-size: 13px; margin-top: 8px;" data-en="Use the Policy Advisor and ⭐ Save schemes you like!" data-hi="नीति सलाहकार का उपयोग करें और ⭐ पसंदीदा योजनाएं सहेजें!">Use the <strong>Policy Advisor</strong> and ⭐ Save schemes you like!</p>
                 </div>
                 {% endif %}
             </div>
@@ -351,10 +352,25 @@
     </main>
 
     <footer class="footer" style="margin-top: 60px;">
-        <p>Yojana Mitra — Empowering citizens with knowledge 🇮🇳</p>
-        <p class="footer-disclaimer">Data sourced from official government portals.</p>
+        <p data-en="Yojana Mitra — Empowering citizens with knowledge 🇮🇳" data-hi="योजना मित्र — नागरिकों को ज्ञान से सशक्त बनाना 🇮🇳">Yojana Mitra — Empowering citizens with knowledge 🇮🇳</p>
+        <p class="footer-disclaimer" data-en="Data sourced from official government portals." data-hi="डेटा आधिकारिक सरकारी पोर्टलों से प्राप्त।">Data sourced from official government portals.</p>
     </footer>
 <script>
+    let currentLang = 'en';
+
+    function applyLang(lang) {
+        document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+            const text = el.getAttribute('data-' + lang);
+            if (text) el.textContent = text;
+        });
+    }
+
+    document.getElementById('dashLangToggle').addEventListener('click', () => {
+        currentLang = currentLang === 'en' ? 'hi' : 'en';
+        document.getElementById('dashLangToggle').textContent = currentLang === 'en' ? 'EN / हिं' : 'हिं / EN';
+        applyLang(currentLang);
+    });
+
     async function removeSaved(schemeId, btn) {
         btn.textContent = '...';
         btn.disabled = true;
