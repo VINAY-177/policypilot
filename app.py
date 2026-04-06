@@ -10,12 +10,14 @@ import os
 import sqlite3
 import psycopg2
 import psycopg2.extras
+from datetime import timedelta
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "super_secret_yojanamitra_key_dev")
+app.permanent_session_lifetime = timedelta(days=30)
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
@@ -667,6 +669,7 @@ def register():
         
     user = get_user_by_phone(phone)
     
+    session.permanent = True
     session["user_id"] = user["id"]
     session["user_name"] = user["name"]
     session["user_phone"] = phone
@@ -681,6 +684,7 @@ def login():
     user = get_user_by_phone(phone)
     
     if user and check_password_hash(user["password_hash"], password):
+        session.permanent = True
         session["user_id"] = user["id"]
         session["user_name"] = user["name"]
         session["user_phone"] = user["phone"]
