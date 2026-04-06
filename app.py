@@ -663,7 +663,7 @@ def login_required(f):
 @app.route("/")
 def index():
     if "user_id" in session:
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("home"))
     return render_template("login.html")
 
 
@@ -689,7 +689,7 @@ def register():
     session["user_id"] = user["id"]
     session["user_name"] = user["name"]
     session["user_phone"] = phone
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("home"))
 
 
 @app.route("/login", methods=["POST"])
@@ -704,7 +704,7 @@ def login():
         session["user_id"] = user["id"]
         session["user_name"] = user["name"]
         session["user_phone"] = user["phone"]
-        return redirect(url_for("dashboard"))
+        return redirect(url_for("home"))
     else:
         flash("Invalid phone number or password")
         return redirect(url_for("index"))
@@ -714,6 +714,13 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("index"))
+
+
+@app.route("/home")
+@login_required
+def home():
+    saved = get_saved_schemes(session.get("user_id"))
+    return render_template("home.html", user_name=session.get("user_name"), user_phone=session.get("user_phone"), saved_schemes=saved)
 
 
 @app.route("/dashboard")

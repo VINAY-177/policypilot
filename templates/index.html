@@ -30,13 +30,15 @@
             </div>
             <div class="header-actions" style="display: flex; align-items: center; gap: 12px;">
                 {% if user_name %}
-                <span class="header-user" style="font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                <nav style="display: flex; gap: 15px; margin-right: 20px;">
+                    <a href="/home" style="text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 14px;" data-en="Home" data-hi="होम">Home</a>
+                    <a href="/advisor" style="text-decoration: none; color: var(--accent-primary); font-weight: 700; font-size: 14px;" data-en="Advisor" data-hi="सलाहकार">Advisor</a>
+                    <a href="/dashboard" style="text-decoration: none; color: var(--text-secondary); font-weight: 600; font-size: 14px;" data-en="Profile" data-hi="प्रोफ़ाइल">Profile</a>
+                </nav>
+                <span style="font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px;">
                     <span style="background: var(--accent-gradient); color: white; border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-heading);">{{ user_name[0]|upper }}</span>
                     {{ user_name.split(' ')[0] }}
                 </span>
-                <a href="/dashboard" class="lang-toggle" style="text-decoration: none; font-size: 14px; font-weight: 600;" title="Go to Dashboard">
-                    📊 Dashboard
-                </a>
                 <a href="/logout" class="lang-toggle" style="text-decoration: none;" title="Sign Out">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 </a>
