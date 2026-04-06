@@ -7,20 +7,108 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        .login-container {
+        .login-page-wrapper {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             position: relative;
             z-index: 10;
+            gap: 60px;
+            padding: 40px 24px;
         }
+        /* --- Floating Emoji Particles --- */
+        .floating-icons {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        .floating-icons span {
+            position: absolute;
+            font-size: 28px;
+            opacity: 0.12;
+            animation: floatIcon 18s linear infinite;
+        }
+        .floating-icons span:nth-child(1) { left: 5%; animation-delay: 0s; font-size: 32px; }
+        .floating-icons span:nth-child(2) { left: 15%; animation-delay: -3s; }
+        .floating-icons span:nth-child(3) { left: 28%; animation-delay: -6s; font-size: 24px; }
+        .floating-icons span:nth-child(4) { left: 42%; animation-delay: -9s; }
+        .floating-icons span:nth-child(5) { left: 55%; animation-delay: -2s; font-size: 36px; }
+        .floating-icons span:nth-child(6) { left: 68%; animation-delay: -12s; }
+        .floating-icons span:nth-child(7) { left: 78%; animation-delay: -5s; font-size: 22px; }
+        .floating-icons span:nth-child(8) { left: 88%; animation-delay: -15s; }
+        .floating-icons span:nth-child(9) { left: 35%; animation-delay: -8s; font-size: 30px; }
+        .floating-icons span:nth-child(10) { left: 92%; animation-delay: -1s; }
+        @keyframes floatIcon {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- Hero Illustration Side --- */
+        .login-hero {
+            max-width: 420px;
+            text-align: center;
+            animation: fadeInUp 0.8s ease;
+        }
+        .login-hero-graphic {
+            width: 320px;
+            height: 260px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+        .login-hero-graphic svg { width: 100%; height: 100%; }
+        .login-hero h2 {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .login-hero p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 28px;
+        }
+        .feature-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .feature-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            background: rgba(16,185,129,0.08);
+            border: 1px solid rgba(16,185,129,0.2);
+            color: var(--accent-primary);
+            animation: fadeInUp 0.6s ease both;
+        }
+        .feature-pill:nth-child(2) { animation-delay: 0.1s; }
+        .feature-pill:nth-child(3) { animation-delay: 0.2s; }
+        .feature-pill:nth-child(4) { animation-delay: 0.3s; }
+
+        /* --- Login Box --- */
         .login-box {
             max-width: 420px;
             width: 100%;
             padding: 40px;
             text-align: center;
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.88);
+            position: relative;
+            z-index: 2;
         }
         .login-logo {
             display: inline-flex;
@@ -29,10 +117,7 @@
             gap: 12px;
             margin-bottom: 20px;
         }
-        .login-logo img {
-            width: 50px;
-            height: 50px;
-        }
+        .login-logo img { width: 50px; height: 50px; }
         .login-title {
             font-family: var(--font-heading);
             font-size: 28px;
@@ -48,11 +133,7 @@
             margin-bottom: 16px;
             text-align: left;
         }
-        .login-submit {
-            margin-top: 10px;
-        }
-        
-        /* Auth Tabs */
+        .login-submit { margin-top: 10px; }
         .auth-tabs {
             display: flex;
             background: rgba(16, 185, 129, 0.1);
@@ -76,15 +157,8 @@
             color: var(--accent-primary);
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        
-        .auth-section {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .auth-section.active {
-            display: block;
-        }
-        
+        .auth-section { display: none; animation: fadeIn 0.3s ease; }
+        .auth-section.active { display: block; }
         .flash-msg {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
@@ -95,10 +169,45 @@
             font-size: 13px;
             font-weight: 500;
         }
-        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Stat counters */
+        .login-stats {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .login-stat {
+            text-align: center;
+        }
+        .login-stat-number {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .login-stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 860px) {
+            .login-hero { display: none; }
+            .login-page-wrapper { justify-content: center; }
         }
     </style>
 </head>
@@ -109,7 +218,72 @@
         <div class="bg-orb bg-orb-3"></div>
     </div>
 
-    <div class="login-container">
+    <!-- Floating Emoji Particles -->
+    <div class="floating-icons">
+        <span>🏛️</span><span>📜</span><span>🌾</span><span>💰</span><span>🎓</span>
+        <span>🏥</span><span>🏠</span><span>👨‍🌾</span><span>🇮🇳</span><span>⭐</span>
+    </div>
+
+    <div class="login-page-wrapper">
+
+        <!-- Left Hero Illustration -->
+        <div class="login-hero">
+            <div class="login-hero-graphic">
+                <svg viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Shield Background -->
+                    <path d="M160 20 L280 70 L270 180 C260 230 200 255 160 260 C120 255 60 230 50 180 L40 70 Z" fill="url(#shieldGrad)" opacity="0.12"/>
+                    <path d="M160 30 L270 75 L261 175 C252 220 197 242 160 247 C123 242 68 220 59 175 L50 75 Z" fill="none" stroke="url(#shieldStroke)" stroke-width="2" stroke-dasharray="6 4" opacity="0.3"/>
+                    <!-- Center Emblem -->
+                    <circle cx="160" cy="130" r="50" fill="url(#emblGrad)" opacity="0.15"/>
+                    <circle cx="160" cy="130" r="38" fill="white" stroke="url(#emblGrad)" stroke-width="2.5"/>
+                    <text x="160" y="140" text-anchor="middle" font-size="36">🇮🇳</text>
+                    <!-- Orbiting Icons -->
+                    <g>
+                        <circle cx="95" cy="80" r="22" fill="white" stroke="#10b981" stroke-width="1.5" filter="url(#iconShadow)"/>
+                        <text x="95" y="87" text-anchor="middle" font-size="20">🌾</text>
+                        <animateTransform attributeName="transform" type="rotate" from="0 160 130" to="360 160 130" dur="30s" repeatCount="indefinite"/>
+                    </g>
+                    <g>
+                        <circle cx="225" cy="80" r="22" fill="white" stroke="#3b82f6" stroke-width="1.5" filter="url(#iconShadow)"/>
+                        <text x="225" y="87" text-anchor="middle" font-size="20">🎓</text>
+                        <animateTransform attributeName="transform" type="rotate" from="120 160 130" to="480 160 130" dur="30s" repeatCount="indefinite"/>
+                    </g>
+                    <g>
+                        <circle cx="160" cy="210" r="22" fill="white" stroke="#f59e0b" stroke-width="1.5" filter="url(#iconShadow)"/>
+                        <text x="160" y="217" text-anchor="middle" font-size="20">🏥</text>
+                        <animateTransform attributeName="transform" type="rotate" from="240 160 130" to="600 160 130" dur="30s" repeatCount="indefinite"/>
+                    </g>
+                    <!-- Defs -->
+                    <defs>
+                        <linearGradient id="shieldGrad" x1="40" y1="20" x2="280" y2="260">
+                            <stop offset="0%" stop-color="#10b981"/>
+                            <stop offset="100%" stop-color="#3b82f6"/>
+                        </linearGradient>
+                        <linearGradient id="shieldStroke" x1="40" y1="20" x2="280" y2="260">
+                            <stop offset="0%" stop-color="#10b981"/>
+                            <stop offset="100%" stop-color="#06b6d4"/>
+                        </linearGradient>
+                        <linearGradient id="emblGrad" x1="110" y1="80" x2="210" y2="180">
+                            <stop offset="0%" stop-color="#10b981"/>
+                            <stop offset="100%" stop-color="#3b82f6"/>
+                        </linearGradient>
+                        <filter id="iconShadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.08"/>
+                        </filter>
+                    </defs>
+                </svg>
+            </div>
+            <h2>Your Gateway to 1500+ Government Schemes</h2>
+            <p>Discover schemes for education, health, housing, agriculture, business, and more — all personalized by AI to match your exact profile.</p>
+            <div class="feature-pills">
+                <span class="feature-pill">🎯 AI-Powered Matching</span>
+                <span class="feature-pill">🗣️ Voice Assistant</span>
+                <span class="feature-pill">🌐 Hindi + English</span>
+                <span class="feature-pill">⭐ Save Favorites</span>
+            </div>
+        </div>
+
+        <!-- Right Login Form -->
         <div class="glass-card login-box">
             <div class="login-logo">
                 <img src="/static/logo.png?v=3" alt="Yojana Mitra" style="width: 80px; height: 80px; object-fit: contain;">
@@ -166,6 +340,22 @@
                     
                     <button type="submit" class="submit-btn login-submit">Create Account</button>
                 </form>
+            </div>
+
+            <!-- Stats -->
+            <div class="login-stats">
+                <div class="login-stat">
+                    <div class="login-stat-number">1500+</div>
+                    <div class="login-stat-label">Schemes</div>
+                </div>
+                <div class="login-stat">
+                    <div class="login-stat-number">30</div>
+                    <div class="login-stat-label">States</div>
+                </div>
+                <div class="login-stat">
+                    <div class="login-stat-number">14</div>
+                    <div class="login-stat-label">Categories</div>
+                </div>
             </div>
 
         </div>

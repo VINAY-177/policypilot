@@ -922,5 +922,155 @@ def scheme_detail(scheme_id):
     return jsonify({"error": "Scheme not found"}), 404
 
 
+# -------------------------------------------------------------------
+# Scheme Discussion / Q&A
+# -------------------------------------------------------------------
+def find_schemes_by_keyword(query):
+    """Search schemes by keyword in name, benefit, or category."""
+    query_lower = query.lower().strip()
+    matches = []
+    for scheme in SCHEMES:
+        searchable = " ".join([
+            scheme.get("name", ""),
+            scheme.get("shortName", ""),
+            scheme.get("benefit", ""),
+            scheme.get("category", ""),
+            scheme.get("simpleExplanation", ""),
+            scheme.get("id", "")
+        ]).lower()
+        if query_lower in searchable:
+            matches.append(scheme)
+    return matches[:10]  # Limit to 10 results
+
+
+def build_scheme_answer(scheme, question, lang="en"):
+    """Build a detailed answer about a scheme based on the user's question."""
+    q = question.lower()
+    parts = []
+
+    # Header
+    parts.append(f"**{scheme.get('icon','')} {scheme.get('name', '')}**")
+    parts.append("")
+
+    # Determine what the user is asking about
+    asks_docs = any(w in q for w in ["document", "docs", "paper", "kagaz", "dastavez", "proof", "certificate"])
+    asks_apply = any(w in q for w in ["apply", "how to", "register", "aavedan", "kaise", "process", "step"])
+    asks_eligible = any(w in q for w in ["eligible", "qualify", "patra", "yogya", "who can", "kaun", "criteria"])
+    asks_benefit = any(w in q for w in ["benefit", "amount", "money", "kitna", "labh", "paisa", "value", "how much"])
+    asks_general = not (asks_docs or asks_apply or asks_eligible or asks_benefit)
+
+    if asks_general or asks_benefit:
+        parts.append(f"💰 **Benefit:** {scheme.get('benefit', 'N/A')}")
+        parts.append(f"📝 {scheme.get('simpleExplanation', '')}")
+        parts.append("")
+
+    if asks_eligible or asks_general:
+        elig = scheme.get("eligibility", {})
+        parts.append("✅ **Eligibility:**")
+        if elig.get("minAge") and elig.get("maxAge"):
+            parts.append(f"  • Age: {elig['minAge']}–{elig['maxAge']} years")
+        if elig.get("maxIncome") and elig["maxIncome"] < 999999990:
+            parts.append(f"  • Max Income: ₹{elig['maxIncome']:,}/year")
+        cats = elig.get("categories", [])
+        if cats:
+            parts.append(f"  • Categories: {', '.join(c.upper() for c in cats)}")
+        genders = elig.get("gender", [])
+        if len(genders) < 3:
+            parts.append(f"  • Gender: {', '.join(genders)}")
+        states = elig.get("states", "all")
+        if states != "all" and isinstance(states, list):
+            parts.append(f"  • States: {', '.join(s.title() for s in states[:5])}{'...' if len(states) > 5 else ''}")
+        parts.append("")
+
+    if asks_apply or asks_general:
+        steps = scheme.get("howToApply", [])
+        if steps:
+            parts.append("📋 **How to Apply:**")
+            for i, step in enumerate(steps, 1):
+                parts.append(f"  {i}. {step}")
+            parts.append("")
+
+    if asks_docs or asks_general:
+        docs = scheme.get("documentsRequired", [])
+        if docs:
+            parts.append("🧾 **Documents Required:**")
+            for doc in docs:
+                parts.append(f"  • {doc}")
+            parts.append("")
+
+    url = scheme.get("officialUrl", "")
+    if url:
+        parts.append(f"🌐 **Official Website:** {url}")
+
+    return "\n".join(parts)
+
+
+@app.route("/api/discuss", methods=["POST"])
+def discuss():
+    """
+    Discuss specific schemes with the user.
+    Accepts a question and optional scheme_id or search keywords.
+    """
+    data = request.get_json()
+    question = data.get("question", "").strip()
+    scheme_id = data.get("scheme_id", "")
+    lang = data.get("lang", "en")
+
+    if not question:
+        return jsonify({
+            "answer": "Please ask a question about a government scheme! For example: 'Tell me about PM-KISAN' or 'What documents do I need for Ayushman Bharat?'"
+        })
+
+    # If a specific scheme_id is provided, answer about that scheme
+    if scheme_id:
+        for scheme in SCHEMES:
+            if scheme["id"] == scheme_id:
+                answer = build_scheme_answer(scheme, question, lang)
+                return jsonify({"answer": answer, "scheme_id": scheme_id})
+        return jsonify({"answer": "Sorry, I couldn't find that scheme."})
+
+    # Otherwise, search by keywords in the question
+    # Extract key search terms (remove common question words)
+    stop_words = {"tell", "me", "about", "what", "is", "the", "how", "to", "can", "i",
+                  "do", "does", "get", "for", "in", "of", "a", "an", "are", "this",
+                  "which", "who", "need", "mujhe", "batao", "kya", "hai", "ke", "ka",
+                  "ki", "se", "ko", "ye", "wo", "yeh", "scheme", "yojana"}
+    words = question.lower().split()
+    search_terms = [w for w in words if w not in stop_words and len(w) > 2]
+
+    found_schemes = []
+    for term in search_terms:
+        found_schemes.extend(find_schemes_by_keyword(term))
+
+    # Deduplicate
+    seen_ids = set()
+    unique_schemes = []
+    for s in found_schemes:
+        if s["id"] not in seen_ids:
+            seen_ids.add(s["id"])
+            unique_schemes.append(s)
+
+    if unique_schemes:
+        # If we found exactly one strong match, give detailed answer
+        if len(unique_schemes) == 1:
+            answer = build_scheme_answer(unique_schemes[0], question, lang)
+            return jsonify({"answer": answer, "scheme_id": unique_schemes[0]["id"]})
+
+        # Otherwise list the matches and let user pick
+        answer_parts = [f"I found **{len(unique_schemes)}** schemes matching your query:\n"]
+        for i, s in enumerate(unique_schemes[:8], 1):
+            answer_parts.append(f"{i}. {s.get('icon','')} **{s.get('name','')}** — {s.get('benefit','')[:80]}")
+
+        if len(unique_schemes) > 8:
+            answer_parts.append(f"\n...and {len(unique_schemes)-8} more.")
+
+        answer_parts.append("\nAsk me about any specific one, e.g. *\"Tell me about the first one\"* or mention its name!")
+        return jsonify({"answer": "\n".join(answer_parts), "matches": len(unique_schemes)})
+
+    return jsonify({
+        "answer": "I couldn't find a scheme matching your query. Try asking about a specific topic like 'education scholarships', 'housing scheme', 'farmer loan', or mention a scheme by name!"
+    })
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

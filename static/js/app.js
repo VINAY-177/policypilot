@@ -136,6 +136,8 @@
         if (indicator) indicator.remove();
     }
 
+    let resultsShown = false; // Track if results have been shown
+
     async function sendChatMessage() {
         const message = chatInput.value.trim();
         if (!message) return;
@@ -150,43 +152,72 @@
         addTypingIndicator();
 
         try {
+            // Detect if this is a scheme-discussion question (after results are shown)
+            const discussKeywords = ['tell me about', 'what is', 'how to apply', 'documents', 'eligibility',
+                'explain', 'details', 'benefit', 'who can', 'kaise', 'batao', 'patra',
+                'dastavez', 'labh', 'first one', 'second one', 'third one', 'mudra', 'kisan',
+                'ayushman', 'sukanya', 'ujjwala', 'scholarship', 'pension', 'housing', 'loan'];
+            const isDiscussion = resultsShown && discussKeywords.some(kw => message.toLowerCase().includes(kw));
 
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: message,
-                    profile: chatProfile,
-                    lang: currentLang
-                })
-            });
+            let data;
 
-            const data = await response.json();
-            
-            removeTypingIndicator();
+            if (isDiscussion) {
+                // Use the discuss endpoint
+                const response = await fetch('/api/discuss', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question: message,
+                        lang: currentLang
+                    })
+                });
+                data = await response.json();
+                removeTypingIndicator();
 
-            // Update accumulated profile
-            if (data.profile) {
-                chatProfile = data.profile;
-            }
+                // Format markdown-like bold text
+                let answer = (data.answer || 'Sorry, I could not find an answer.')
+                    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                    .replace(/\n/g, '<br>');
+                addChatMessage(answer);
+            } else {
+                // Use the normal chat endpoint for profiling
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        profile: chatProfile,
+                        lang: currentLang
+                    })
+                });
+                data = await response.json();
+                removeTypingIndicator();
 
-            if (data.type === 'question') {
-                // Bot asks follow-up
-                addChatMessage(data.message.replace(/\n/g, '<br>'));
-                speakResponse(data.message);
-            } else if (data.type === 'results') {
-                // Show summary message
-                addChatMessage(data.message.replace(/\n/g, '<br>'));
+                // Update accumulated profile
+                if (data.profile) {
+                    chatProfile = data.profile;
+                }
 
-                // Render results below chat
-                if (data.results) {
-                    renderResults(data.results);
-                    resultsSection.classList.remove('hidden');
+                if (data.type === 'question') {
+                    addChatMessage(data.message.replace(/\n/g, '<br>'));
+                    speakResponse(data.message);
+                } else if (data.type === 'results') {
+                    addChatMessage(data.message.replace(/\n/g, '<br>'));
+                    resultsShown = true;
 
-                    // Smooth scroll to results
+                    // Add a follow-up hint
                     setTimeout(() => {
-                        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 300);
+                        addChatMessage("💡 <em>You can now ask me about any specific scheme! Try: \"Tell me about PM-KISAN\" or \"What documents do I need for Ayushman Bharat?\"</em>");
+                    }, 1500);
+
+                    if (data.results) {
+                        renderResults(data.results);
+                        resultsSection.classList.remove('hidden');
+                        setTimeout(() => {
+                            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 300);
+                    }
                 }
             }
         } catch (error) {
@@ -471,6 +502,18 @@
             `;
         }
 
+        let docsHTML = '';
+        if (scheme.documentsRequired && scheme.documentsRequired.length > 0) {
+            docsHTML = `
+                <details class="scheme-details-card scheme-steps-interactive" style="margin-top: 6px;">
+                    <summary class="scheme-steps-title">🧾 ${currentLang === 'hi' ? 'आवश्यक दस्तावेज़ (क्लिक करें)' : 'Documents Required (Click to expand)'}</summary>
+                    <div class="details-content">
+                        <ul style="margin:0;padding-left:20px;">${scheme.documentsRequired.map(doc => `<li>${doc}</li>`).join('')}</ul>
+                    </div>
+                </details>
+            `;
+        }
+
         card.innerHTML = `
             <div class="scheme-card-header">
                 <div>
@@ -484,6 +527,7 @@
             <div class="scheme-why">✅ ${currentLang === 'hi' ? 'आप पात्र क्यों हैं' : 'Why you qualify'}: ${scheme.whyQualify}</div>
             <div class="scheme-explanation">${scheme.simpleExplanation}</div>
             ${stepsHTML}
+            ${docsHTML}
             <div class="scheme-action-row" style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <a href="${scheme.officialUrl}" target="_blank" class="scheme-link scheme-action-btn">
                     🌐 ${currentLang === 'hi' ? 'आधिकारिक वेबसाइट' : 'Apply on Official Website'} →
