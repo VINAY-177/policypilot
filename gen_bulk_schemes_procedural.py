@@ -600,6 +600,114 @@ for sector_en, sector_hi in RURAL_SECTORS:
         }
     ])
 
+EDUCATION_SECTORS = [
+    ("Primary Education", "प्राथमिक शिक्षा"),
+    ("Higher Education", "उच्च शिक्षा"),
+    ("Vocational Training", "व्यावसायिक प्रशिक्षण"),
+    ("Special Education", "विशेष शिक्षा"),
+    ("STEM Education", "स्टेम शिक्षा"),
+    ("Digital Learning", "डिजिटल लर्निंग"),
+    ("Girl Child Education", "बालिका शिक्षा"),
+    ("Adult Education", "वयस्क शिक्षा"),
+    ("Teacher Training", "शिक्षक प्रशिक्षण"),
+    ("Sports Education", "खेल शिक्षा")
+]
+
+HEALTH_SECTORS = [
+    ("Maternal Health", "मातृ स्वास्थ्य"),
+    ("Child Nutrition", "बाल पोषण"),
+    ("Mental Health", "मानसिक स्वास्थ्य"),
+    ("Telemedicine", "टेलीमेडिसिन"),
+    ("Ayurveda & AYUSH", "आयुर्वेद और आयुष"),
+    ("Preventive Care", "निवारक देखभाल"),
+    ("Geriatric Care", "वृद्धाश्रम देखभाल"),
+    ("Disability Support", "विकलांगता सहायता"),
+    ("Emergency Medicine", "आपातकालीन चिकित्सा"),
+    ("Public Sanitation", "सार्वजनिक स्वच्छता")
+]
+
+# 6. Education Sectors (10 * 10 = 100)
+for sector_en, sector_hi in EDUCATION_SECTORS:
+    sec_id = sector_en.lower().replace(" & ", "-").replace(" ", "-")
+    for i in range(1, 11):
+        roles = [
+            ("Scholarship", "छात्रवृत्ति", "Financial aid for students", "छात्रों के लिए वित्तीय सहायता", 15000),
+            ("Digital Infra", "डिजिटल इंफ्रा", "Providing tablets and laptops", "टैबलेट और लैपटॉप प्रदान करना", 25000),
+            ("Teacher Grant", "शिक्षक अनुदान", "Reimbursement for curriculum development", "पाठ्यक्रम विकास के लिए प्रतिपूर्ति", 10000),
+            ("Innovation Lab", "नवाचार प्रयोगशाला", "Funding for school laboratories", "स्कूल प्रयोगशालाओं के लिए वित्तपोषण", 200000),
+            ("Transport Allowance", "परिवहन भत्ता", "Free travel for rural students", "ग्रामीण छात्रों के लिए मुफ्त यात्रा", 5000),
+            ("Hostel Subsidy", "छात्रावास सब्सिडी", "Accommodation support for merit students", "मेधावी छात्रों के लिए आवास सहायता", 12000),
+            ("Skill Certification", "कौशल प्रमाणन", "Free global certification exams", "मुफ्त वैश्विक प्रमाणन परीक्षा", 8000),
+            ("Research Fellowship", "अनुसंधान फैलोशिप", "Monthly stipend for PhD scholars", "पीएचडी विद्वानों के लिए मासिक वजीफा", 45000),
+            ("Special Needs Aid", "विशेष आवश्यकता सहायता", "Hearing aids and braille kits", "श्रवण यंत्र और ब्रेल किट", 15000),
+            ("Sports Equipment", "खेल उपकरण", "Grants for physical education", "शारीरिक शिक्षा के लिए अनुदान", 50000)
+        ]
+        
+        role_en, role_hi, desc_en, desc_hi, val = roles[i-1]
+        
+        new_schemes.append({
+            "id": f"edu-{sec_id}-{i}",
+            "name": f"National {sector_en} {role_en} Scheme",
+            "shortName": f"{sector_en} {role_en}",
+            "category": "education",
+            "icon": "🎓",
+            "benefit": f"Up to ₹{val:,} for {desc_en.lower()} in {sector_en}",
+            "benefitValue": val,
+            "simpleExplanation": f"This scheme provides {desc_en.lower()} to boost the {sector_en} sector nationwide.",
+            "eligibility": {"minAge": 5, "maxAge": 60, "maxIncome": 500000, "categories": ["general", "obc", "sc", "st"], "gender": ["male", "female", "other"], "occupations": ["student", "teacher", "unemployed"], "states": "all", "conditions": []},
+            "howToApply": ["Register on the National Education Portal", "Submit required academic documents", "Aadhaar authentication"],
+            "documentsRequired": ["Aadhaar", "Previous year marksheets", "Income Certificate"],
+            "officialUrl": "https://education.gov.in",
+            "whyQualifyTemplate": f"You qualify for the {sector_en} {role_en} scheme.",
+            "nameHi": f"राष्ट्रीय {sector_hi} {role_hi} योजना",
+            "shortNameHi": f"{sector_hi} {role_hi}",
+            "benefitHi": f"{sector_hi} में {desc_hi} के लिए ₹{val:,} तक",
+            "simpleExplanationHi": f"यह योजना देश भर में {sector_hi} क्षेत्र को बढ़ावा देने के लिए {desc_hi} प्रदान करती है।",
+            "documentsRequiredHi": ["आधार", "संस्थान आईडी", "आय प्रमाण पत्र"],
+            "howToApplyHi": ["राष्ट्रीय शिक्षा पोर्टल पर पंजीकरण करें", "आवश्यक शैक्षणिक दस्तावेज जमा करें", "आधार प्रमाणीकरण"]
+        })
+
+# 7. Health Sectors (10 * 10 = 100)
+for sector_en, sector_hi in HEALTH_SECTORS:
+    sec_id = sector_en.lower().replace(" & ", "-").replace(" ", "-")
+    for i in range(1, 11):
+        roles = [
+            ("Free Treatment", "मुफ्त इलाज", "Complete coverage for major surgeries", "बड़ी सर्जरी के लिए पूरा कवरेज", 500000),
+            ("Medicine Subsidy", "दवा सब्सिडी", "90% discount on generic medicines", "जेनेरिक दवाओं पर 90% छूट", 5000),
+            ("Diagnostic Camp", "निदान शिविर", "Free whole body checkups", "मुफ्त पूरे शरीर की जांच", 3000),
+            ("Maternity Benefit", "मातृत्व लाभ", "Cash transfer for pregnant women", "गर्भवती महिलाओं के लिए नकद हस्तांतरण", 6000),
+            ("Rehab Package", "पुनर्वास पैकेज", "Post-surgery physical therapy", "सर्जरी के बाद शारीरिक चिकित्सा", 15000),
+            ("Teleconsultation", "टेलीपरामर्श", "24/7 free specialist doctor calls", "24/7 मुफ्त विशेषज्ञ डॉक्टर कॉल", 1000),
+            ("Vaccination Drive", "टीकाकरण अभियान", "Fully subsidized premium vaccines", "पूरी तरह से सब्सिडी वाले प्रीमियम टीके", 2000),
+            ("Mental Wellness", "मानसिक स्वास्थ्य", "Free counseling sessions", "मुफ्त परामर्श सत्र", 4000),
+            ("Ambulance Service", "एम्बुलेंस सेवा", "Zero-cost emergency transport", "शून्य-लागत आपातकालीन परिवहन", 1500),
+            ("Nutrition Kit", "पोषण किट", "Monthly ration of protein supplements", "प्रोटीन सप्लीमेंट का मासिक राशन", 2500)
+        ]
+        
+        role_en, role_hi, desc_en, desc_hi, val = roles[i-1]
+        
+        new_schemes.append({
+            "id": f"hlth-{sec_id}-{i}",
+            "name": f"{sector_en} {role_en} Mission",
+            "shortName": f"{sector_en} {role_en}",
+            "category": "health",
+            "icon": "🏥",
+            "benefit": f"Coverage of ₹{val:,} for {desc_en.lower()} under {sector_en}",
+            "benefitValue": val,
+            "simpleExplanation": f"A targeted health initiative providing {desc_en.lower()} to citizens requiring {sector_en} services.",
+            "eligibility": {"minAge": 0, "maxAge": 100, "maxIncome": 800000, "categories": ["general", "obc", "sc", "st"], "gender": ["male", "female", "other"], "occupations": ["all"], "states": "all", "conditions": []},
+            "howToApply": ["Visit nearest government registered hospital", "Show your e-Health Card or Aadhaar", "Avail cashless benefits"],
+            "documentsRequired": ["Aadhaar", "Ayushman/Health Card", "Doctor Prescription"],
+            "officialUrl": "https://mohfw.gov.in",
+            "whyQualifyTemplate": f"You are eligible for {sector_en} {role_en} benefits.",
+            "nameHi": f"{sector_hi} {role_hi} मिशन",
+            "shortNameHi": f"{sector_hi} {role_hi}",
+            "benefitHi": f"{sector_hi} के तहत {desc_hi} के लिए ₹{val:,} का कवरेज",
+            "simpleExplanationHi": f"एक लक्षित स्वास्थ्य पहल जो {sector_hi} सेवाओं की आवश्यकता वाले नागरिकों को {desc_hi} प्रदान करती है।",
+            "documentsRequiredHi": ["आधार", "आयुष्मान/स्वास्थ्य कार्ड", "डॉक्टर का पर्चा"],
+            "howToApplyHi": ["निकटतम सरकारी पंजीकृत अस्पताल जाएं", "अपना ई-हेल्थ कार्ड या आधार दिखाएं", "कैशलेस लाभों का लाभ उठाएं"]
+        })
+
 # Write back to schemes.json safely
 try:
     with open(SCHEMES_PATH, "r", encoding="utf-8") as f:
