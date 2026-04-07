@@ -57,6 +57,14 @@
             <h2 class="hero-title" data-en="Discover Government Schemes<br>Made For <span class='highlight'>You</span>" data-hi="सरकारी योजनाएं खोजें<br>जो <span class='highlight'>आपके</span> लिए बनी हैं">Discover Government Schemes<br>Made For <span class="highlight">You</span></h2>
             <p class="hero-subtitle" data-en="Tell us about yourself and we'll find the best schemes you're eligible for — from PM-KISAN to Ayushman Bharat and 20+ more." data-hi="अपने बारे में बताएं और हम आपके लिए सबसे अच्छी योजनाएं ढूंढेंगे — PM-KISAN से लेकर आयुष्मान भारत और 20+ और योजनाएं।">Tell us about yourself and we'll find the best schemes you're eligible for — from PM-KISAN to Ayushman Bharat and 20+ more.</p>
 
+            <!-- Quick Persona Chips -->
+            <div class="persona-chips">
+                <button class="persona-btn" data-persona="farmer" data-en="🌾 I'm a Farmer" data-hi="🌾 मैं किसान हूँ">🌾 I'm a Farmer</button>
+                <button class="persona-btn" data-persona="student" data-en="🎓 I'm a Student" data-hi="🎓 मैं छात्र हूँ">🎓 I'm a Student</button>
+                <button class="persona-btn" data-persona="woman_entrepreneur" data-en="💼 Woman Entrepreneur" data-hi="💼 महिला उद्यमी">💼 Woman Entrepreneur</button>
+                <button class="persona-btn" data-persona="senior" data-en="👴 Senior Citizen" data-hi="👴 वरिष्ठ नागरिक">👴 Senior Citizen</button>
+            </div>
+
             <!-- Mode Toggle -->
             <div class="mode-toggle">
                 <button class="mode-btn active" id="chatModeBtn" data-en="💬 Chat with Advisor" data-hi="💬 सलाहकार से बात करें">💬 Chat with Advisor</button>
@@ -192,6 +200,7 @@
                         <label class="checkbox-label"><input type="checkbox" value="senior_citizen"> 🧓 <span data-en="Senior Citizen (60+)" data-hi="वरिष्ठ नागरिक (60+)">Senior Citizen (60+)</span></label>
                         <label class="checkbox-label"><input type="checkbox" value="widow"> 👩 <span data-en="Widow" data-hi="विधवा">Widow</span></label>
                         <label class="checkbox-label"><input type="checkbox" value="rural"> 🏡 <span data-en="Rural Area" data-hi="ग्रामीण क्षेत्र">Rural Area</span></label>
+                        <label class="checkbox-label"><input type="checkbox" value="business"> 💼 <span data-en="Business / MSME" data-hi="व्यापार / एमएसएमई">Business / MSME</span></label>
                         <label class="checkbox-label"><input type="checkbox" value="artisan"> 🔨 <span data-en="Artisan/Craftsperson" data-hi="कारीगर">Artisan/Craftsperson</span></label>
                         <label class="checkbox-label"><input type="checkbox" value="street_vendor"> 🏪 <span data-en="Street Vendor" data-hi="रेहड़ी/ठेला">Street Vendor</span></label>
                         <label class="checkbox-label"><input type="checkbox" value="parent_of_girl_child"> 👧 <span data-en="Parent of Girl Child" data-hi="बेटी के माता/पिता">Parent of Girl Child</span></label>
@@ -212,7 +221,40 @@
         <section class="results-section hidden" id="resultsSection">
             <!-- Populated by JavaScript -->
         </section>
+        <!-- Trust & Safety Banner -->
+        <section class="fraud-banner" id="fraudBanner">
+            <div class="fraud-icon">⚠️</div>
+            <div class="fraud-content">
+                <h4 data-en="Stay Safe from Scams" data-hi="घोटालों से सावधान रहें">Stay Safe from Scams</h4>
+                <p data-en="Government schemes never ask for money or OTP over the phone. Always apply through official portals (gov.in sites)." data-hi="सरकारी योजनाएं कभी भी फोन पर पैसे या ओटीपी नहीं मांगती हैं। हमेशा आधिकारिक पोर्टलों (gov.in साइटों) के माध्यम से आवेदन करें।">Government schemes never ask for money or OTP over the phone. Always apply through official portals (gov.in sites).</p>
+            </div>
+        </section>
     </main>
+
+    <!-- Comparison Bar -->
+    <div class="comparison-bar" id="comparisonBar">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="background: var(--accent-primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;" id="compareCount">0</div>
+            <div style="font-weight: 700; color: var(--text-primary);" data-en="Schemes Selected" data-hi="योजनाएं चुनी गईं">Schemes Selected</div>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="clearSelection()" style="background: none; border: none; color: var(--text-secondary); font-weight: 600; cursor: pointer; font-size: 14px;" data-en="Clear" data-hi="साफ़ करें">Clear</button>
+            <button onclick="showComparison()" style="background: var(--accent-primary); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px var(--accent-glow);" id="compareBtn" data-en="Compare Now" data-hi="तुलना करें">Compare Now</button>
+        </div>
+    </div>
+
+    <!-- Comparison Modal -->
+    <div class="comparison-modal" id="comparisonModal">
+        <div class="comparison-container">
+            <div class="comparison-header">
+                <h2 style="font-family: var(--font-heading); font-size: 20px; font-weight: 800;" data-en="Scheme Comparison" data-hi="योजना तुलना">Scheme Comparison</h2>
+                <button class="close-modal" onclick="closeComparison()">✕</button>
+            </div>
+            <div class="comparison-body" id="comparisonBody">
+                <!-- Table injected here -->
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

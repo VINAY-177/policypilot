@@ -8,8 +8,12 @@ import json
 import re
 import os
 import sqlite3
-import psycopg2
-import psycopg2.extras
+try:
+    import psycopg2
+    import psycopg2.extras
+    HAS_PSYCOPG2 = True
+except ImportError:
+    HAS_PSYCOPG2 = False
 from datetime import timedelta
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -27,7 +31,7 @@ else:
     DB_PATH = os.path.join(os.path.dirname(__file__), "database.db")
 
 def get_db_connection():
-    if DATABASE_URL:
+    if DATABASE_URL and HAS_PSYCOPG2:
         conn = psycopg2.connect(DATABASE_URL)
         return conn
     else:
@@ -37,7 +41,7 @@ def get_db_connection():
 
 def init_db():
     conn = get_db_connection()
-    if DATABASE_URL:
+    if DATABASE_URL and HAS_PSYCOPG2:
         with conn.cursor() as cur:
             cur.execute('''
                 CREATE TABLE IF NOT EXISTS users (
@@ -427,107 +431,118 @@ def generate_followup_question(missing_fields, lang="en"):
 # Eligibility Engine
 # -------------------------------------------------------------------
 def check_eligibility(profile, scheme):
-    """Check if a user profile matches a scheme's eligibility criteria."""
+    """
+    Check if a user profile matches a scheme's eligibility criteria.
+    Returns (is_eligible, score, detailed_reasons).
+    """
     elig = scheme["eligibility"]
-
-    # Age check
+    reasons = []
+    
+    # 1. Age check
     age = profile.get("age", 25)
-    if age < elig.get("minAge", 0) or age > elig.get("maxAge", 200):
-        return False, 0
+    min_age = elig.get("minAge", 0)
+    max_age = elig.get("maxAge", 200)
+    age_matched = min_age <= age <= max_age
+    reasons.append({"label": "Age", "value": f"{age} years", "matched": age_matched})
+    if not age_matched:
+        return False, 0, reasons
 
-    # Income check
+    # 2. Income check
     income = profile.get("income", 300000)
-    if income > elig.get("maxIncome", 999999999):
-        return False, 0
+    max_income = elig.get("maxIncome", 999999999)
+    income_matched = income <= max_income
+    reasons.append({"label": "Annual Income", "value": f"₹{income:,}", "matched": income_matched})
+    if not income_matched:
+        return False, 0, reasons
 
-    # Category check
+    # 3. Category check
     category = profile.get("category", "general")
-    if category not in elig.get("categories", []):
-        # Check alsoEligibleIf
-        also = elig.get("alsoEligibleIf", {})
-        if category not in also.get("categories", []):
-            return False, 0
+    allowed_categories = elig.get("categories", [])
+    also_elig = elig.get("alsoEligibleIf", {}).get("categories", [])
+    cat_matched = (category in allowed_categories) or (category in also_elig)
+    reasons.append({"label": "Category", "value": category.upper(), "matched": cat_matched})
+    if not cat_matched:
+        return False, 0, reasons
 
-    # Gender check
+    # 4. Gender check
     gender = profile.get("gender", "male")
     eligible_genders = elig.get("gender", ["male", "female", "other"])
-    if gender not in eligible_genders:
-        # Check alsoEligibleIf
-        also = elig.get("alsoEligibleIf", {})
-        if gender not in also.get("gender", []):
-            return False, 0
+    also_gender = elig.get("alsoEligibleIf", {}).get("gender", [])
+    gender_matched = (gender in eligible_genders) or (gender in also_gender)
+    reasons.append({"label": "Gender", "value": gender.capitalize(), "matched": gender_matched})
+    if not gender_matched:
+        return False, 0, reasons
 
-    # Occupation check
+    # 5. Occupation check
     occupation = profile.get("occupation", "")
     eligible_occupations = elig.get("occupations", "all")
-    if eligible_occupations != "all":
-        if occupation not in eligible_occupations:
-            return False, 0
+    if eligible_occupations == "all":
+        occ_matched = True
+    else:
+        occ_matched = occupation in eligible_occupations
+    
+    if occupation or eligible_occupations != "all":
+        reasons.append({"label": "Occupation", "value": occupation.replace('_', ' ').capitalize() if occupation else "Any", "matched": occ_matched})
+        if not occ_matched:
+            return False, 0, reasons
 
-    # State check
+    # 6. State check
     state = profile.get("state", "").lower()
     eligible_states = elig.get("states", "all")
-    if eligible_states != "all":
-        if state not in [s.lower() for s in eligible_states]:
-            return False, 0
+    if eligible_states == "all":
+        state_matched = True
+    else:
+        state_matched = state in [s.lower() for s in eligible_states]
+    
+    if state or eligible_states != "all":
+        reasons.append({"label": "State", "value": state.capitalize() if state else "All India", "matched": state_matched})
+        if not state_matched:
+            return False, 0, reasons
 
-    # Required conditions check
+    # 7. Required conditions check
     conditions = set(profile.get("conditions", []))
     required_conditions = elig.get("conditions", [])
+    cond_matched = True
     if required_conditions:
-        if not conditions.intersection(set(required_conditions)):
-            # Special handling: if condition matches occupation
-            if occupation in required_conditions:
-                pass  # occupation already serves as condition
-            else:
-                return False, 0
+        if conditions.intersection(set(required_conditions)) or occupation in required_conditions:
+            cond_matched = True
+        else:
+            cond_matched = False
+        
+        reasons.append({"label": "Special Criteria", "value": ", ".join(required_conditions).replace('_', ' ').capitalize(), "matched": cond_matched})
+        if not cond_matched:
+            return False, 0, reasons
 
-    # Exclude conditions check
+    # 8. Exclude conditions check
     exclude = elig.get("excludeConditions", [])
     if exclude and conditions.intersection(set(exclude)):
-        return False, 0
+        reasons.append({"label": "Exclusion", "value": "Matched restricted criteria", "matched": False})
+        return False, 0, reasons
 
-    # --- Calculate relevance score ---
+    # --- Calculate relevance score (for ranking) ---
     score = 10  # Base score for being eligible
-
-    # Benefit value contributes to score
+    
     benefit_value = scheme.get("benefitValue", 0)
-    if benefit_value >= 500000:
-        score += 30
-    elif benefit_value >= 100000:
-        score += 20
-    elif benefit_value >= 10000:
-        score += 10
-    else:
-        score += 5
+    if benefit_value >= 500000: score += 30
+    elif benefit_value >= 100000: score += 20
+    elif benefit_value >= 10000: score += 10
+    else: score += 5
 
-    # Occupation match bonus
-    if eligible_occupations != "all" and occupation in eligible_occupations:
-        score += 15
-
-    # Category priority bonus
+    if eligible_occupations != "all" and occupation in eligible_occupations: score += 15
+    
     priority = elig.get("priority", [])
-    if category in priority:
-        score += 10
-
-    # Gender relevance bonus
-    if len(eligible_genders) < 3 and gender in eligible_genders:
-        score += 10  # Gender-specific scheme that matches
-
-    # Condition match bonus
-    if required_conditions and conditions.intersection(set(required_conditions)):
+    if category in priority: score += 10
+    
+    if len(eligible_genders) < 3 and gender in eligible_genders: score += 10
+    
+    if required_conditions and (conditions.intersection(set(required_conditions)) or occupation in required_conditions):
         score += 15
 
-    # Income-sensitivity: lower income gets higher relevance for welfare schemes
     if income < 200000 and scheme["category"] in ["welfare", "health", "pension", "employment"]:
         score += 10
 
-    # Also eligible via special criteria bonus
-    also = elig.get("alsoEligibleIf", {})
-    if gender in also.get("gender", []):
-        score += 8
+    return True, score, reasons
 
-    return True, score
 
 
 import copy
@@ -537,18 +552,34 @@ def get_recommendations(profile, lang="en"):
     eligible = []
 
     for scheme in SCHEMES:
-        is_eligible, score = check_eligibility(profile, scheme)
+        is_eligible, score, detailed_reasons = check_eligibility(profile, scheme)
         if is_eligible:
+            # Calculate match percentage based on matched reasons
+            total_reasons = len(detailed_reasons)
+            matched_count = sum(1 for r in detailed_reasons if r.get('matched'))
+            match_percentage = int((matched_count / total_reasons) * 100) if total_reasons > 0 else 100
+            
+            # Confidence labels
+            if match_percentage >= 90 and score >= 50: confidence = "Highly Eligible"
+            elif match_percentage >= 75: confidence = "Likely Eligible"
+            else: confidence = "Needs More Details"
+            
+            # Translate labels
+            if lang == "hi":
+                confidence = confidence.replace("Highly Eligible", "अत्यधिक पात्र").replace("Likely Eligible", "संभावित पात्र").replace("Needs More Details", "अधिक जानकारी की आवश्यकता है")
+
             eligible.append({
-                "scheme": copy.deepcopy(scheme),  # Deep copy to prevent modifying global!
+                "scheme": copy.deepcopy(scheme),
                 "score": score,
-                "whyQualify": _build_why_qualify(profile, scheme)
+                "matchPercentage": match_percentage,
+                "confidenceLabel": confidence,
+                "reasons": detailed_reasons
             })
 
     # Sort by score descending
     eligible.sort(key=lambda x: x["score"], reverse=True)
 
-    # Show ALL valid schemes instead of just the top 3
+    # Show top schemes
     top3 = eligible
     others = []
     total_eligible = len(eligible)
@@ -563,18 +594,14 @@ def get_recommendations(profile, lang="en"):
             s["simpleExplanation"] = s.get("simpleExplanationHi", s.get("simpleExplanation", ""))
             s["howToApply"] = s.get("howToApplyHi", s.get("howToApply", []))
             s["documentsRequired"] = s.get("documentsRequiredHi", s.get("documentsRequired", []))
-            # Translate whyQualify conditionally if we have basic mapping or just leave it
-            item["whyQualify"] = item["whyQualify"].replace('Your age', 'आपकी आयु').replace('is within the eligible range', 'पात्रता सीमा के भीतर है').replace('Your income qualifies you', 'आपकी आय आपको पात्र बनाती है').replace('matches this scheme', 'इस योजना से मेल खाता है')
             
-        for item in others:
-            s = item["scheme"]
-            s["name"] = s.get("nameHi", s.get("name", ""))
-            s["shortName"] = s.get("shortNameHi", s.get("shortName", ""))
-            s["benefit"] = s.get("benefitHi", s.get("benefit", ""))
+            # Translate reasons labels
+            for r in item["reasons"]:
+                r["label"] = r["label"].replace("Age", "आयु").replace("Annual Income", "वार्षिक आय").replace("Category", "श्रेणी").replace("Gender", "लिंग").replace("Occupation", "पेशा").replace("State", "राज्य").replace("Special Criteria", "विशेष मानदंड")
 
     # Aggregate documents
     all_docs = set()
-    for item in top3 + others:
+    for item in top3:
         for doc in item["scheme"].get("documentsRequired", []):
             all_docs.add(doc)
 
@@ -586,23 +613,15 @@ def get_recommendations(profile, lang="en"):
             "icon": item["scheme"].get("icon"),
             "category": item["scheme"].get("category"),
             "benefit": item["scheme"].get("benefit"),
-            "whyQualify": item["whyQualify"],
+            "reasons": item["reasons"],
+            "confidenceLabel": item["confidenceLabel"],
+            "matchPercentage": item["matchPercentage"],
             "simpleExplanation": item["scheme"].get("simpleExplanation"),
             "howToApply": item["scheme"].get("howToApply"),
             "officialUrl": item["scheme"].get("officialUrl"),
             "documentsRequired": item["scheme"].get("documentsRequired", []),
             "score": item["score"]
         } for item in top3],
-        "others": [{
-            "id": item["scheme"]["id"],
-            "name": item["scheme"].get("name"),
-            "shortName": item["scheme"].get("shortName"),
-            "icon": item["scheme"].get("icon"),
-            "category": item["scheme"].get("category"),
-            "benefit": item["scheme"].get("benefit"),
-            "officialUrl": item["scheme"].get("officialUrl"),
-            "score": item["score"]
-        } for item in others],
         "documentsRequired": sorted(list(all_docs)),
         "totalEligible": total_eligible
     }
@@ -1145,6 +1164,20 @@ def discuss():
 
     not_found = "मुझे आपकी खोज से मिलती-जुलती कोई योजना नहीं मिली। 'शिक्षा छात्रवृत्ति', 'आवास योजना', 'किसान ऋण' जैसे विषय पूछें!" if lang == "hi" else "I couldn't find a scheme matching your query. Try asking about a specific topic like 'education scholarships', 'housing scheme', 'farmer loan', or mention a scheme by name!"
     return jsonify({"answer": not_found})
+
+
+@app.route("/api/schemes/batch", methods=["POST"])
+@login_required
+def api_schemes_batch():
+    data = request.get_json()
+    ids = data.get("ids", [])
+    matched_schemes = []
+    for s_id in ids:
+        # Find scheme in SCHEMES
+        scheme = next((s for s in SCHEMES if s['id'] == s_id), None)
+        if scheme:
+            matched_schemes.append(scheme)
+    return jsonify({"schemes": matched_schemes})
 
 
 if __name__ == "__main__":

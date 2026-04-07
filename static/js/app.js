@@ -10,6 +10,7 @@
     // State
     // ============================================================
     let currentLang = 'en';
+    let currentResults = null;
     let chatProfile = {};  // Accumulated profile from chat conversation
     let currentMode = 'chat'; // 'chat' or 'form'
 
@@ -390,15 +391,26 @@
     // ============================================================
     function renderResults(data) {
         resultsSection.innerHTML = '';
+        currentResults = data; // Store for download
 
         // Results header
         const header = document.createElement('div');
         header.className = 'results-header';
         header.innerHTML = `
-            <h2 class="results-title">🔷 ${currentLang === 'hi' ? 'आपके लिए शीर्ष योजनाएं' : 'Top Schemes For You'}</h2>
-            <p class="results-count">${currentLang === 'hi' ? 'आप' : 'You are eligible for'} <strong>${data.totalEligible} ${currentLang === 'hi' ? 'योजनाओं के लिए पात्र हैं' : 'schemes'}</strong></p>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                <div style="text-align: left;">
+                    <h2 class="results-title">🔷 ${currentLang === 'hi' ? 'आपके लिए शीर्ष योजनाएं' : 'Top Schemes For You'}</h2>
+                    <p class="results-count">${currentLang === 'hi' ? 'आप' : 'You are eligible for'} <strong>${data.totalEligible} ${currentLang === 'hi' ? 'योजनाओं के लिए पात्र हैं' : 'schemes'}</strong></p>
+                </div>
+                <button class="persona-btn" id="downloadSummaryBtn" style="background: var(--accent-primary); color: white; border: none;">
+                    📥 ${currentLang === 'hi' ? 'रिपोर्ट डाउनलोड करें' : 'Download Summary'}
+                </button>
+            </div>
         `;
         resultsSection.appendChild(header);
+
+        // Download Listener
+        $('#downloadSummaryBtn').onclick = () => downloadSummary(data);
 
         // Top 3 schemes
         if (data.top3 && data.top3.length > 0) {
@@ -493,31 +505,47 @@
         card.className = 'scheme-card';
         card.setAttribute('data-category', scheme.category);
 
-        let stepsHTML = '';
-        if (scheme.howToApply && scheme.howToApply.length > 0) {
-            stepsHTML = `
-                <details class="scheme-details-card scheme-steps-interactive">
-                    <summary class="scheme-steps-title">📋 ${currentLang === 'hi' ? 'आवेदन कैसे करें (क्लिक करें)' : 'How to Apply (Click to expand)'}</summary>
-                    <div class="details-content">
-                        <ol>${scheme.howToApply.map(step => `<li>${step}</li>`).join('')}</ol>
-                    </div>
-                </details>
+        // Structured Reasons HTML
+        let reasonsHTML = '<div class="reasons-list">';
+        scheme.reasons.forEach(r => {
+            reasonsHTML += `
+                <div class="reason-item ${r.matched ? 'matched' : ''}">
+                    <span class="icon">${r.matched ? '✅' : '❌'}</span>
+                    <span>${r.label}: ${r.value}</span>
+                </div>
+            `;
+        });
+        reasonsHTML += '</div>';
+
+        // Document Checklist (only for top 3)
+        let checklistHTML = '';
+        if (scheme.documentsRequired && scheme.documentsRequired.length > 0) {
+            checklistHTML = `
+                <div class="doc-checklist">
+                    <div class="doc-checklist-title">📋 ${currentLang === 'hi' ? 'पात्रता हेतु आपके दस्तावेज़' : 'Your Application Checklist'}</div>
+                    ${scheme.documentsRequired.map(doc => `
+                        <label class="doc-item">
+                            <input type="checkbox"> <span>${doc}</span>
+                        </label>
+                    `).join('')}
+                </div>
             `;
         }
 
-        let docsHTML = '';
-        if (scheme.documentsRequired && scheme.documentsRequired.length > 0) {
-            docsHTML = `
-                <details class="scheme-details-card scheme-steps-interactive" style="margin-top: 6px;">
-                    <summary class="scheme-steps-title">🧾 ${currentLang === 'hi' ? 'आवश्यक दस्तावेज़ (क्लिक करें)' : 'Documents Required (Click to expand)'}</summary>
-                    <div class="details-content">
-                        <ul style="margin:0;padding-left:20px;">${scheme.documentsRequired.map(doc => `<li>${doc}</li>`).join('')}</ul>
-                    </div>
-                </details>
-            `;
-        }
+        card.onclick = (e) => {
+            // Don't toggle if clicking buttons
+            if (e.target.closest('.scheme-action-btn') || e.target.closest('input[type="checkbox"]')) return;
+            toggleSelection(scheme.id, card);
+        };
 
         card.innerHTML = `
+            <div class="comparison-checkbox-container" style="position: absolute; top: 20px; right: 20px; z-index: 5; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--accent-primary); background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 4px;">${currentLang === 'hi' ? 'तुलना करें' : 'COMPARE'}</span>
+                <div class="comparison-checkbox">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+            </div>
+
             <div class="scheme-card-header">
                 <div>
                     <div class="scheme-icon">${scheme.icon}</div>
@@ -525,17 +553,40 @@
                 </div>
                 <div class="scheme-rank">#${rank}</div>
             </div>
-            <span class="scheme-category-tag">${scheme.category}</span>
+            
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+                <span class="scheme-category-tag">${scheme.category}</span>
+                <span class="confidence-badge ${scheme.confidenceLabel.toLowerCase().includes('highly') || scheme.confidenceLabel.includes('अत्यधिक') ? 'highly-eligible' : 'likely-eligible'}">
+                    ${scheme.confidenceLabel}
+                </span>
+            </div>
+
+            <!-- Match Meter -->
+            <div class="eligibility-meter-row">
+                <div class="meter-circle" style="--percentage: ${scheme.matchPercentage}%" data-score="${scheme.matchPercentage}%"></div>
+                <div>
+                    <div style="font-size: 13px; font-weight: 700;">${currentLang === 'hi' ? 'पात्रता मिलान' : 'Eligibility Confidence'}</div>
+                    <div style="font-size: 11px; color: var(--text-secondary);">${currentLang === 'hi' ? 'आपके प्रोफाइल के आधार पर' : 'Based on your profile triggers'}</div>
+                </div>
+            </div>
+
             <div class="scheme-benefit">💰 ${scheme.benefit}</div>
-            <div class="scheme-why">✅ ${currentLang === 'hi' ? 'आप पात्र क्यों हैं' : 'Why you qualify'}: ${scheme.whyQualify}</div>
+            
+            <div style="font-size: 14px; font-weight: 700; margin-top: 16px;">💡 ${currentLang === 'hi' ? 'आप पात्र क्यों हैं' : 'Why it matches your profile'}</div>
+            ${reasonsHTML}
+            
             <div class="scheme-explanation">${scheme.simpleExplanation}</div>
-            ${stepsHTML}
-            ${docsHTML}
+            
+            ${checklistHTML}
+
             <div class="scheme-action-row" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="${scheme.officialUrl}" target="_blank" class="scheme-link scheme-action-btn">
-                    🌐 ${currentLang === 'hi' ? 'आधिकारिक वेबसाइट' : 'Apply on Official Website'} →
+                <a href="${scheme.officialUrl}" target="_blank" class="scheme-link scheme-action-btn official-btn" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">
+                    🌐 ${currentLang === 'hi' ? 'आधिकारिक आवेदन' : 'Official Apply Link'} →
                 </a>
-                <button class="scheme-action-btn save-scheme-btn" onclick="saveScheme(this, '${scheme.id}', \`${(scheme.name || '').replace(/`/g, "'")}\`, '${scheme.icon}', \`${(scheme.benefit || '').replace(/`/g, "'")}\`)" style="background: rgba(16,185,129,0.1); color: var(--accent-primary); border: 1px solid var(--accent-primary); cursor: pointer; font-weight: 600; border-radius: 8px; padding: 10px 18px; font-size: 14px; transition: all 0.3s ease;">
+                <button class="scheme-action-btn verify-btn" onclick="speakResponse('${scheme.simpleExplanation.replace(/'/g, "\\'")}')">
+                    🔊 ${currentLang === 'hi' ? 'विवरण सुनें' : 'Read Aloud'}
+                </button>
+                <button class="scheme-action-btn save-scheme-btn" onclick="saveScheme(this, '${scheme.id}', \`${(scheme.name || '').replace(/`/g, "'")}\`, '${scheme.icon}', \`${(scheme.benefit || '').replace(/`/g, "'")}\`)" style="flex: 1; min-width: 150px; background: rgba(16,185,129,0.1); color: var(--accent-primary); border: 1px solid var(--accent-primary); cursor: pointer; font-weight: 600; border-radius: 8px; padding: 10px 18px; font-size: 14px;">
                     ⭐ ${currentLang === 'hi' ? 'सेव करें' : 'Save to Dashboard'}
                 </button>
             </div>
@@ -543,6 +594,77 @@
 
         return card;
     }
+
+    // ============================================================
+    // Download Summary Logic
+    // ============================================================
+    function downloadSummary(data) {
+        let text = `--- YOJANA MITRA REPORT ---\n`;
+        text += `Date: ${new Date().toLocaleDateString()}\n`;
+        text += `Total Eligible Schemes: ${data.totalEligible}\n\n`;
+
+        data.top3.forEach((s, i) => {
+            text += `${i+1}. ${s.name}\n`;
+            text += `   Benefit: ${s.benefit}\n`;
+            text += `   Confidence: ${s.confidenceLabel}\n`;
+            text += `   Why Matched: ${s.reasons.filter(r=>r.matched).map(r=>r.label).join(', ')}\n`;
+            text += `   Apply: ${s.officialUrl}\n\n`;
+        });
+
+        text += `\nREQUIRED DOCUMENTS CHECKLIST:\n`;
+        data.documentsRequired.forEach(doc => {
+            text += `[ ] ${doc}\n`;
+        });
+
+        text += `\nDisclaimer: Always verify on official gov.in websites. This report is for information only.`;
+
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Yojana_Mitra_Report_${new Date().toISOString().split('T')[0]}.txt`;
+        a.click();
+    }
+
+    // ============================================================
+    // Persona Logic
+    // ============================================================
+    $$('.persona-btn[data-persona]').forEach(btn => {
+        btn.onclick = () => {
+            const persona = btn.dataset.persona;
+            if (persona === 'farmer') {
+                $('#formAge').value = 45;
+                $('#formOccupation').value = 'farmer';
+                $('#formIncome').value = 80000;
+                $('#formState').value = 'uttar pradesh';
+                $$('.conditions-grid input').forEach(i => i.checked = (i.value === 'farmer' || i.value === 'rural'));
+            } else if (persona === 'student') {
+                $('#formAge').value = 20;
+                $('#formOccupation').value = 'student';
+                $('#formIncome').value = 150000;
+                $$('.conditions-grid input').forEach(i => i.checked = (i.value === 'student'));
+            } else if (persona === 'woman_entrepreneur') {
+                $('#formAge').value = 32;
+                $('#formGender').value = 'female';
+                $('#formOccupation').value = 'entrepreneur';
+                $('#formIncome').value = 300000;
+                $$('.conditions-grid input').forEach(i => i.checked = (i.value === 'business'));
+            } else if (persona === 'senior') {
+                $('#formAge').value = 65;
+                $('#formOccupation').value = 'unemployed';
+                $('#formIncome').value = 50000;
+                $$('.conditions-grid input').forEach(i => i.checked = (i.value === 'senior_citizen'));
+            }
+            
+            // Highlight form
+            $('#formModeBtn').click();
+            profileForm.scrollIntoView({ behavior: 'smooth' });
+            
+            // Pulse submit button
+            $('#submitBtn').classList.add('pulse');
+            setTimeout(()=> $('#submitBtn').classList.remove('pulse'), 2000);
+        };
+    });
 
     // ============================================================
     // Save Scheme to Dashboard
@@ -577,8 +699,133 @@
     };
 
     // ============================================================
-    // Focus on chat input on load
+    // Comparison Logic
     // ============================================================
+    let selectedIds = new Set();
+    const MAX_COMPARE = 3;
+
+    window.toggleSelection = function(id, el) {
+        if (selectedIds.has(id)) {
+            selectedIds.delete(id);
+            el.classList.remove('selected');
+        } else {
+            if (selectedIds.size >= MAX_COMPARE) {
+                alert(currentLang === 'hi' ? `आप एक बार में केवल ${MAX_COMPARE} योजनाओं की तुलना कर सकते हैं।` : `You can compare up to ${MAX_COMPARE} schemes at once.`);
+                return;
+            }
+            selectedIds.add(id);
+            el.classList.add('selected');
+        }
+        updateBar();
+    };
+
+    function updateBar() {
+        const bar = $('#comparisonBar');
+        const count = $('#compareCount');
+        const btn = $('#compareBtn');
+        
+        if (!bar || !count || !btn) return;
+
+        count.textContent = selectedIds.size;
+        if (selectedIds.size > 0) {
+            bar.classList.add('active');
+            btn.disabled = selectedIds.size < 2;
+            btn.style.opacity = selectedIds.size < 2 ? '0.5' : '1';
+        } else {
+            bar.classList.remove('active');
+        }
+    }
+
+    window.clearSelection = function() {
+        selectedIds.forEach(id => {
+            const el = document.querySelector(`.scheme-card.selected`); // Note: simplified for dynamic results
+            if (el) el.classList.remove('selected');
+        });
+        // Just clear all .selected cards globally in advisor
+        $$('.scheme-card.selected').forEach(el => el.classList.remove('selected'));
+        selectedIds.clear();
+        updateBar();
+    };
+
+    window.showComparison = async function() {
+        const body = $('#comparisonBody');
+        body.innerHTML = '<div style="text-align:center; padding:40px;">⏳ Loading comparison data...</div>';
+        $('#comparisonModal').classList.add('active');
+
+        try {
+            const res = await fetch('/api/schemes/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids: Array.from(selectedIds) })
+            });
+            const data = await res.json();
+            renderComparisonTable(data.schemes);
+        } catch (e) {
+            body.innerHTML = '<div style="color:red; text-align:center; padding:40px;">❌ Error loading data</div>';
+        }
+    };
+
+    function renderComparisonTable(schemes) {
+        const body = $('#comparisonBody');
+        
+        let html = `<table class="comparison-table">
+            <thead>
+                <tr>
+                    <th class="feature-col"></th>
+                    ${schemes.map(s => `
+                        <th class="scheme-header">
+                            <div style="font-size: 32px;">${s.icon}</div>
+                            <div class="scheme-title">${currentLang === 'hi' ? (s.nameHi || s.name) : s.name}</div>
+                        </th>
+                    `).join('')}
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="feature-col">${currentLang === 'hi' ? 'श्रेणी' : 'Category'}</td>
+                    ${schemes.map(s => `<td><span class="scheme-category-tag">${s.category}</span></td>`).join('')}
+                </tr>
+                <tr>
+                    <td class="feature-col">${currentLang === 'hi' ? 'प्रमुख लाभ' : 'Key Benefit'}</td>
+                    ${schemes.map(s => `<td class="benefit-text">${currentLang === 'hi' ? (s.benefitHi || s.benefit) : s.benefit}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td class="feature-col">${currentLang === 'hi' ? 'आयु सीमा' : 'Age Criteria'}</td>
+                    ${schemes.map(s => `<td>${s.eligibility.minAge} - ${s.eligibility.maxAge} years</td>`).join('')}
+                </tr>
+                <tr>
+                    <td class="feature-col">${currentLang === 'hi' ? 'आय सीमा' : 'Income Limit'}</td>
+                    ${schemes.map(s => `<td>${s.eligibility.maxIncome < 9999999 ? 'Up to ₹' + s.eligibility.maxIncome.toLocaleString() : (currentLang === 'hi' ? 'कोई सीमा नहीं' : 'No Limit')}</td>`).join('')}
+                </tr>
+                <tr>
+                    <td class="feature-col">${currentLang === 'hi' ? 'आवश्यक दस्तावेज़' : 'Documents Required'}</td>
+                    ${schemes.map(s => `
+                        <td>
+                            <ul>
+                                ${(currentLang === 'hi' ? (s.documentsRequiredHi || s.documentsRequired) : s.documentsRequired).map(doc => `<li>${doc}</li>`).join('')}
+                            </ul>
+                        </td>
+                    `).join('')}
+                </tr>
+                <tr>
+                    <td class="feature-col"></td>
+                    ${schemes.map(s => `
+                        <td style="text-align:center;">
+                            <a href="${s.officialUrl}" target="_blank" style="display:inline-block; background:var(--accent-primary); color:white; padding:8px 16px; border-radius:6px; text-decoration:none; font-weight:700; font-size:12px;">Apply Now</a>
+                        </td>
+                    `).join('')}
+                </tr>
+            </tbody>
+        </table>`;
+        
+        body.innerHTML = html;
+    }
+
+    window.closeComparison = function() {
+        $('#comparisonModal').classList.remove('active');
+    };
+
+    // Focus on chat input on load
     chatInput.focus();
 
 })();
